@@ -104,6 +104,15 @@ const ACTIONS = {
         if (roll < 0.95) return { a: 'mix' };
         return { a: 'clear' };
     },
+    'barber-shop': () => {
+        const roll = Math.random();
+        if (roll < 0.1) return { a: 'tool', t: Math.floor(rand(0, 3)) };
+        if (roll < 0.15) return { a: 'dye', d: Math.floor(rand(0, 7)) };
+        const a = rand(0, Math.PI * 2);
+        const y = rand(0.3, 1);
+        const r = Math.sqrt(Math.max(0, 1 - y * y));
+        return { a: 'stroke', x: Math.cos(a) * r, y, z: Math.sin(a) * r, dt: 0.08 };
+    },
     'voxel-sandbox': () => (Math.random() < 0.5
         ? { a: 'mine', x: Math.floor(rand(0, 28)), y: Math.floor(rand(1, 8)), z: Math.floor(rand(0, 28)) }
         : { a: 'place', x: Math.floor(rand(0, 28)), y: Math.floor(rand(1, 8)), z: Math.floor(rand(0, 28)), b: Math.ceil(rand(1, 6)) }),

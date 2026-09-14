@@ -167,7 +167,7 @@ Status values: `TODO` / `WIP` / `DONE`.
 | 12 | Game 10 — Collecting Car Coins | DONE | |
 | 13 | Game 11 — Guess Animal | DONE | Animal table is server-only on purpose; the client gets a shape, never a name |
 | 14 | Game 12 — Science Game | DONE | |
-| 15 | Game 13 — Barber Game | TODO | |
+| 15 | Game 13 — Barber Game | DONE | |
 | 16 | Integration: link the Arcade from `huud-website.html`, README, final polish | TODO | |
 
 ---
