@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="description" content="HUUD Family Arcade - 14 players, 13 games, one link. Phones, iPads and PCs together.">
+<meta name="theme-color" content="#0b0c10">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>HUUD Family Arcade</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%AE%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Luckiest+Guy&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/arcade.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "/vendor/three/three.module.js",
+    "three/": "/vendor/three/",
+    "shared/": "/shared/"
+  }
+}
+</script>
+</head>
+<body>
+
+<!-- The 3D stage. Always present; screens sit on top of it. -->
+<canvas id="stage" aria-label="Game view"></canvas>
+
+<!-- ───────────────────────────── connect ───────────────────────────── -->
+<section class="screen" id="screen-connect" data-screen="connect">
+    <div class="panel">
+        <h1 class="logo">HUUD <span>ARCADE</span></h1>
+        <p class="tagline">14 players. 13 games. One link.</p>
+
+        <label class="field">
+            <span>Your name</span>
+            <input id="name-input" type="text" maxlength="14" autocomplete="nickname"
+                   spellcheck="false" placeholder="Huud">
+        </label>
+
+        <button class="btn btn-primary" id="create-btn">Open a new room</button>
+
+        <div class="or"><span>or join one</span></div>
+
+        <div class="join-row">
+            <input id="code-input" type="text" maxlength="4" inputmode="text" autocapitalize="characters"
+                   spellcheck="false" placeholder="CODE" aria-label="Room code">
+            <button class="btn" id="join-btn">Join</button>
+        </div>
+
+        <p class="status" id="connect-status" role="status" aria-live="polite"></p>
+    </div>
+</section>
+
+<!-- ───────────────────────────── lobby ───────────────────────────── -->
+<section class="screen" id="screen-lobby" data-screen="lobby" hidden>
+    <div class="lobby-wrap">
+        <header class="lobby-head">
+            <div class="room-code">
+                <span class="label">Room code</span>
+                <strong id="room-code">----</strong>
+                <button class="btn btn-ghost btn-sm" id="copy-link-btn">Copy link</button>
+            </div>
+            <div class="lobby-actions">
+                <button class="btn btn-ghost btn-sm" id="leave-btn">Leave</button>
+            </div>
+        </header>
+
+        <div class="lobby-grid">
+            <section class="roster-col">
+                <h2>Players <span id="player-count">0 / 14</span></h2>
+                <ol class="roster" id="roster"></ol>
+            </section>
+
+            <section class="picker-col">
+                <h2>Pick a game</h2>
+                <p class="hint" id="picker-hint">Waiting for the host to choose…</p>
+                <div class="game-grid" id="game-grid"></div>
+            </section>
+        </div>
+
+        <footer class="lobby-foot">
+            <div class="chosen" id="chosen-game"></div>
+            <button class="btn btn-primary btn-lg" id="start-btn" disabled>Start</button>
+        </footer>
+    </div>
+</section>
+
+<!-- ───────────────────────────── in-game HUD ───────────────────────────── -->
+<div class="hud" id="hud" hidden>
+    <div class="hud-top">
+        <div class="hud-chip" id="hud-room">----</div>
+        <div class="hud-chip" id="hud-latency"><i class="dot"></i><span>--</span></div>
+        <div class="hud-timer" id="hud-timer">0:00</div>
+        <button class="hud-chip hud-btn" id="hud-scores-btn" aria-expanded="false">Scores</button>
+    </div>
+
+    <div class="hud-banner" id="hud-banner" aria-live="polite"></div>
+    <div class="hud-objective" id="hud-objective"></div>
+    <!-- Toasts stack directly above whatever controls the game put up, so a tall
+         keypad can never bury them. -->
+    <div class="hud-bottom">
+        <div class="hud-toasts" id="hud-toasts" aria-live="polite"></div>
+        <!-- Games inject their own controls here (keypads, toppings, throttles). -->
+        <div class="hud-panel" id="hud-panel"></div>
+    </div>
+
+    <aside class="scorepad" id="scorepad" hidden>
+        <h3>Scores</h3>
+        <ol id="scorepad-list"></ol>
+    </aside>
+
+    <!-- Touch controls; hidden on devices with a real keyboard. -->
+    <div class="touch-controls" id="touch-controls" hidden>
+        <div class="stick" id="stick"><i class="stick-knob" id="stick-knob"></i></div>
+        <div class="action-buttons">
+            <button class="abtn abtn-b" id="btn-b" aria-label="Secondary action">B</button>
+            <button class="abtn abtn-a" id="btn-a" aria-label="Primary action">A</button>
+        </div>
+    </div>
+
+    <div class="countdown" id="countdown" hidden><span></span></div>
+</div>
+
+<!-- ───────────────────────────── results ───────────────────────────── -->
+<section class="screen screen-overlay" id="screen-results" data-screen="results" hidden>
+    <div class="panel panel-wide">
+        <h2 class="results-title" id="results-title">Results</h2>
+        <ol class="podium" id="podium"></ol>
+        <ol class="results-list" id="results-list"></ol>
+        <div class="results-actions">
+            <button class="btn btn-primary" id="again-btn">Play again</button>
+            <button class="btn" id="back-lobby-btn">Pick another game</button>
+        </div>
+        <p class="status" id="results-hint"></p>
+    </div>
+</section>
+
+<!-- ───────────────────────────── connection veil ───────────────────────────── -->
+<div class="veil" id="veil" hidden>
+    <div class="veil-inner">
+        <div class="spinner"></div>
+        <p id="veil-text">Reconnecting…</p>
+    </div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
