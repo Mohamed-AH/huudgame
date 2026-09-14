@@ -89,6 +89,7 @@ const ACTIONS = {
     'guess-number': () => ({ a: 'guess', v: Math.ceil(rand(1, 100)) }),
     'mango-target': () => ({ a: 'throw', yaw: rand(-1, 1), pitch: rand(0.2, 1.1), pow: rand(0.3, 1) }),
     'baking-kitchen': () => ({ a: 'use' }),
+    'baby-cleaning': () => ({ a: 'use' }),
     'ice-cream': () => {
         const roll = Math.random();
         if (roll < 0.2) return { a: 'flavor', f: Math.floor(rand(0, 4)) };

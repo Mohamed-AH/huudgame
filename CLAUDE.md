@@ -162,7 +162,7 @@ Status values: `TODO` / `WIP` / `DONE`.
 | 7 | Game 5 — Baking Kitchen | DONE | `client/js/lib/crew.js` added here and reused by every walking game |
 | 8 | Game 6 — Ice Cream Inc. | DONE | Found the reserved-wire-key bug; see docs/PROTOCOL.md |
 | 9 | Game 7 — Train Race | DONE | |
-| 10 | Game 8 — Baby Cleaning | TODO | |
+| 10 | Game 8 — Baby Cleaning | DONE | |
 | 11 | Game 9 — Bus Cleaning | TODO | |
 | 12 | Game 10 — Collecting Car Coins | TODO | |
 | 13 | Game 11 — Guess Animal | TODO | |
