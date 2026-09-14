@@ -154,7 +154,7 @@ Status values: `TODO` / `WIP` / `DONE`.
 | 2 | Client core: engine, net, input, HUD, lobby, game loader | DONE | `tools/browser.js` added alongside |
 | 3 | Game 1 — Guess a Number | DONE | |
 | 4 | Game 2 — Voxel Sandbox (Minecraft) | DONE | Terrain is generated from the seed on both sides; only mutations cross the wire |
-| 5 | Game 3 — Car Race | TODO | |
+| 5 | Game 3 — Car Race | DONE | Track geometry lives in `shared/track.js` so the road you see is the road you may drive on |
 | 6 | Game 4 — Mango Target | TODO | |
 | 7 | Game 5 — Baking Kitchen | TODO | |
 | 8 | Game 6 — Ice Cream Inc. | TODO | |
