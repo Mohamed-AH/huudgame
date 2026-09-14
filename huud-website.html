@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="HUUD's official website - Lego builds, game creations, and a golden coin catcher mini-game.">
+    <title>HUUD - The Official Website</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%91%91%3C/text%3E%3C/svg%3E">
+    <!-- Tailwind CSS (pre-compiled, production build - see huud-styles.css) -->
+    <link rel="stylesheet" href="huud-styles.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Luckiest+Guy&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        * { -webkit-tap-highlight-color: transparent; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0b0c10;
+            color: #f3f4f6;
+            overflow-x: hidden;
+            min-height: 100dvh;
+        }
+
+        .font-luckiest {
+            font-family: 'Luckiest Guy', cursive;
+            letter-spacing: 1.5px;
+        }
+
+        .font-fredoka {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        /* Metallic Gold Gradient Text */
+        .gold-text {
+            background: linear-gradient(135deg, #FFF5C0 0%, #FBBF24 35%, #D97706 70%, #FFFBEB 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 20px rgba(217, 119, 6, 0.2);
+        }
+
+        /* Shiny Metallic Gold Border */
+        .gold-border {
+            border: 3px solid #f59e0b;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4), inset 0 0 15px rgba(245, 158, 11, 0.2);
+        }
+
+        .gold-card {
+            background: linear-gradient(145deg, rgba(24, 26, 32, 0.9), rgba(15, 17, 21, 0.95));
+            border: 2px solid rgba(245, 158, 11, 0.3);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        @media (hover: hover) {
+            .gold-card:hover {
+                transform: translateY(-8px) scale(1.02);
+                border-color: #f59e0b;
+                box-shadow: 0 15px 30px rgba(245, 158, 11, 0.3);
+            }
+        }
+
+        /* Gold Shimmer Button Effect */
+        .btn-gold {
+            background: linear-gradient(135deg, #fbbf24, #d97706);
+            color: #000000;
+            font-weight: 800;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.5);
+            transition: all 0.2s ease;
+        }
+
+        @media (hover: hover) {
+            .btn-gold:hover {
+                background: linear-gradient(135deg, #fef08a, #f59e0b);
+                transform: scale(1.05);
+                box-shadow: 0 6px 25px rgba(245, 158, 11, 0.7);
+            }
+        }
+        .btn-gold:active { transform: scale(0.97); }
+
+        /* Pulsing Glow */
+        @keyframes pulseGlow {
+            0%, 100% { filter: drop-shadow(0 0 15px rgba(245, 158, 11, 0.6)); }
+            50% { filter: drop-shadow(0 0 30px rgba(251, 191, 36, 0.9)); }
+        }
+        .glow-pulse { animation: pulseGlow 3s infinite; }
+
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(2deg); }
+        }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+
+        /* Respect reduced-motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .glow-pulse, .animate-float, .animate-bounce, .animate-ping { animation: none !important; }
+            .gold-card, .btn-gold { transition: none !important; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #0f1115; }
+        ::-webkit-scrollbar-thumb { background: #d97706; border-radius: 5px; }
+
+        /* Visible focus states for keyboard users */
+        a:focus-visible, button:focus-visible {
+            outline: 2px solid #fbbf24;
+            outline-offset: 3px;
+            border-radius: 6px;
+        }
+        #game-canvas:focus-visible {
+            outline: 3px solid #fbbf24;
+            outline-offset: -3px;
+        }
+
+        /* Game canvas: taller on bigger screens, shorter on small phones so it never crowds the page */
+        #game-canvas-wrap { height: 15rem; }
+        @media (min-width: 480px) { #game-canvas-wrap { height: 18rem; } }
+        @media (min-width: 768px) { #game-canvas-wrap { height: 22rem; } }
+
+        #game-canvas { touch-action: none; }
+    </style>
+</head>
+<body class="relative min-h-screen selection:bg-amber-400 selection:text-black">
+
+    <canvas id="bg-canvas" class="fixed top-0 left-0 w-full h-full pointer-events-none z-0 opacity-40" aria-hidden="true"></canvas>
+
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-black/60 border-b border-amber-500/30">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-200 flex items-center justify-center font-luckiest text-2xl text-black shadow-lg shadow-amber-500/50 group-hover:scale-110 transition-transform">
+                    H
+                </div>
+                <span class="font-luckiest text-3xl gold-text tracking-wider">HUUD</span>
+            </a>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex items-center gap-8 font-bold text-lg">
+                <a href="#about" class="hover:text-amber-400 transition-colors">About Me</a>
+                <a href="#superpowers" class="hover:text-amber-400 transition-colors">Superpowers</a>
+                <a href="#creations" class="hover:text-amber-400 transition-colors">Creations</a>
+                <a href="#arcade" class="hover:text-amber-400 transition-colors flex items-center gap-2 text-amber-400">
+                    <i data-lucide="gamepad-2" class="w-5 h-5"></i> Gold Arcade
+                </a>
+                <a href="#trophies" class="hover:text-amber-400 transition-colors">Trophies</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <button type="button" id="gold-blast-btn" class="btn-gold px-4 py-2 rounded-full font-fredoka text-sm md:text-base flex items-center gap-2">
+                    <i data-lucide="crown" class="w-4 h-4 text-black"></i> Gold Blast!
+                </button>
+                <button id="mobile-menu-btn" class="md:hidden text-amber-400 text-2xl focus:outline-none p-1" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle navigation menu">
+                    <i data-lucide="menu" class="w-7 h-7"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-black/95 border-b border-amber-500/30 px-6 py-4 flex flex-col gap-4 font-bold">
+            <a href="#about" class="text-lg hover:text-amber-400">About Me</a>
+            <a href="#superpowers" class="text-lg hover:text-amber-400">Superpowers</a>
+            <a href="#creations" class="text-lg hover:text-amber-400">Creations</a>
+            <a href="#arcade" class="text-lg text-amber-400">Gold Arcade</a>
+            <a href="#trophies" class="text-lg hover:text-amber-400">Trophies</a>
+        </div>
+    </header>
+
+    <main class="relative z-10 max-w-6xl mx-auto px-4 space-y-20 md:space-y-24 py-10 md:py-12">
+
+        <section id="about" class="flex flex-col md:flex-row items-center justify-between gap-12 pt-4 md:pt-6">
+            <div class="flex-1 space-y-6 text-center md:text-left">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/10 border border-amber-500/40 text-amber-300 font-bold text-sm tracking-wide">
+                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                    WELCOME TO MY GOLDEN WORLD 🚀
+                </div>
+
+                <h1 class="font-luckiest text-4xl sm:text-5xl md:text-7xl lg:text-8xl leading-tight gold-text glow-pulse">
+                    HI, I'M HUUD!
+                </h1>
+
+                <p class="font-fredoka text-lg sm:text-xl md:text-2xl text-gray-300 leading-relaxed max-w-xl mx-auto md:mx-0">
+                    I am an <span class="text-amber-400 font-bold">8-year-old creator</span>, Lego builder, gamer, and tech explorer! Check out my projects and play my golden coin game below! 🎮✨
+                </p>
+
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-4">
+                    <a href="#arcade" class="btn-gold px-8 py-4 rounded-2xl text-xl font-luckiest flex items-center gap-3">
+                        <i data-lucide="gamepad-2" class="w-6 h-6"></i> PLAY GAME
+                    </a>
+                    <a href="#creations" class="px-8 py-4 rounded-2xl font-bold text-xl border-2 border-amber-500/50 hover:border-amber-400 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 transition-all">
+                        SEE CREATIONS
+                    </a>
+                </div>
+
+                <!-- Quick Stats Badge -->
+                <div class="pt-6 flex justify-center md:justify-start gap-6 sm:gap-8">
+                    <div class="text-center md:text-left">
+                        <div class="font-luckiest text-2xl sm:text-3xl text-amber-400">AGE 8</div>
+                        <div class="text-xs text-gray-400 uppercase tracking-widest font-semibold">Master Builder</div>
+                    </div>
+                    <div class="w-px h-10 bg-amber-500/20"></div>
+                    <div class="text-center md:text-left">
+                        <div class="font-luckiest text-2xl sm:text-3xl text-amber-400">999+</div>
+                        <div class="text-xs text-gray-400 uppercase tracking-widest font-semibold">Lego Bricks</div>
+                    </div>
+                    <div class="w-px h-10 bg-amber-500/20"></div>
+                    <div class="text-center md:text-left">
+                        <div class="font-luckiest text-2xl sm:text-3xl text-amber-400">LVL 10</div>
+                        <div class="text-xs text-gray-400 uppercase tracking-widest font-semibold">Gamer Level</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hero Avatar / Image Box -->
+            <div class="relative flex-1 flex justify-center w-full max-w-sm md:max-w-none">
+                <div class="relative w-64 h-64 sm:w-72 sm:h-72 md:w-96 md:h-96 rounded-3xl bg-gradient-to-tr from-amber-600 via-yellow-400 to-amber-200 p-2 shadow-2xl shadow-amber-500/30 animate-float">
+                    <div class="w-full h-full bg-slate-950 rounded-2xl overflow-hidden relative flex flex-col items-center justify-center p-6 text-center border border-amber-400/30">
+                        <div class="w-32 h-32 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full bg-gradient-to-b from-amber-400 to-amber-600 flex items-center justify-center text-6xl sm:text-7xl md:text-8xl shadow-inner mb-4 border-4 border-amber-200">
+                            👑
+                        </div>
+                        <div class="font-luckiest text-xl sm:text-2xl text-amber-300 tracking-wider">SUPER HUUD</div>
+                        <div class="text-xs font-bold text-amber-500 bg-amber-950/80 px-3 py-1 rounded-full border border-amber-500/40 mt-1">
+                            #1 GOLD CHAMPION
+                        </div>
+                    </div>
+
+                    <!-- Floating Golden Badges -->
+                    <div class="absolute -top-4 -left-4 bg-amber-400 text-black font-luckiest px-3 sm:px-4 py-2 rounded-xl shadow-lg rotate-12 flex items-center gap-2 text-sm sm:text-base">
+                        <i data-lucide="star" class="w-4 h-4 fill-black"></i> STAR KID
+                    </div>
+                    <div class="absolute -bottom-4 -right-4 bg-black text-amber-400 font-luckiest border-2 border-amber-400 px-3 sm:px-4 py-2 rounded-xl shadow-lg -rotate-12 flex items-center gap-2 text-sm sm:text-base">
+                        <i data-lucide="rocket" class="w-4 h-4"></i> EXPLORER
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="superpowers" class="space-y-8">
+            <div class="text-center space-y-3">
+                <h2 class="font-luckiest text-3xl sm:text-4xl md:text-6xl gold-text">MY SUPERPOWERS</h2>
+                <p class="font-fredoka text-lg text-gray-400 max-w-xl mx-auto">Here are some of the epic things I love doing every single day!</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="gold-card p-8 rounded-3xl text-center space-y-4">
+                    <div class="w-20 h-20 mx-auto rounded-2xl bg-amber-500/20 border-2 border-amber-400 flex items-center justify-center text-amber-400 shadow-lg">
+                        <i data-lucide="blocks" class="w-10 h-10"></i>
+                    </div>
+                    <h3 class="font-luckiest text-2xl text-amber-300">LEGO MASTER</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        Designing giant futuristic cities, spaceships, and wild Lego creations with thousands of colorful bricks!
+                    </p>
+                </div>
+
+                <div class="gold-card p-8 rounded-3xl text-center space-y-4">
+                    <div class="w-20 h-20 mx-auto rounded-2xl bg-amber-500/20 border-2 border-amber-400 flex items-center justify-center text-amber-400 shadow-lg">
+                        <i data-lucide="gamepad-2" class="w-10 h-10"></i>
+                    </div>
+                    <h3 class="font-luckiest text-2xl text-amber-300">GAMING PRO</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        Conquering high scores, building awesome worlds in Minecraft, and exploring exciting video game adventures!
+                    </p>
+                </div>
+
+                <div class="gold-card p-8 rounded-3xl text-center space-y-4">
+                    <div class="w-20 h-20 mx-auto rounded-2xl bg-amber-500/20 border-2 border-amber-400 flex items-center justify-center text-amber-400 shadow-lg">
+                        <i data-lucide="code-2" class="w-10 h-10"></i>
+                    </div>
+                    <h3 class="font-luckiest text-2xl text-amber-300">CODE EXPLORER</h3>
+                    <p class="text-gray-300 text-sm leading-relaxed">
+                        Learning how to build web pages, create fun games, and make cool gold websites like this one!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="creations" class="space-y-8">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h2 class="font-luckiest text-3xl sm:text-4xl md:text-6xl gold-text">HUUD'S CREATIONS</h2>
+                    <p class="font-fredoka text-lg text-gray-400">Take a look at my favorite builds, art, and cool stuff!</p>
+                </div>
+                <!-- Filter Buttons -->
+                <div class="flex flex-wrap gap-2" role="group" aria-label="Filter creations">
+                    <button type="button" data-filter="all" class="gallery-btn active px-4 py-2 rounded-xl bg-amber-500 text-black font-bold text-sm">All</button>
+                    <button type="button" data-filter="lego" class="gallery-btn px-4 py-2 rounded-xl bg-slate-900 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 font-bold text-sm">Lego</button>
+                    <button type="button" data-filter="games" class="gallery-btn px-4 py-2 rounded-xl bg-slate-900 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 font-bold text-sm">Games</button>
+                    <button type="button" data-filter="art" class="gallery-btn px-4 py-2 rounded-xl bg-slate-900 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 font-bold text-sm">Art</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="gallery-item lego gold-card rounded-3xl overflow-hidden group">
+                    <div class="h-52 bg-gradient-to-br from-amber-900/40 to-slate-900 relative flex items-center justify-center p-4">
+                        <div class="text-7xl group-hover:scale-125 transition-transform duration-300">🚀</div>
+                        <span class="absolute top-3 right-3 bg-amber-500 text-black font-bold text-xs px-3 py-1 rounded-full">LEGO</span>
+                    </div>
+                    <div class="p-6 space-y-2">
+                        <h3 class="font-luckiest text-xl text-amber-300">Golden Star Spaceship</h3>
+                        <p class="text-xs text-gray-400">Built with 450 Lego pieces featuring double laser boosters!</p>
+                    </div>
+                </div>
+
+                <div class="gallery-item games gold-card rounded-3xl overflow-hidden group">
+                    <div class="h-52 bg-gradient-to-br from-amber-900/40 to-slate-900 relative flex items-center justify-center p-4">
+                        <div class="text-7xl group-hover:scale-125 transition-transform duration-300">🏰</div>
+                        <span class="absolute top-3 right-3 bg-amber-500 text-black font-bold text-xs px-3 py-1 rounded-full">MINECRAFT</span>
+                    </div>
+                    <div class="p-6 space-y-2">
+                        <h3 class="font-luckiest text-xl text-amber-300">The Golden Castle</h3>
+                        <p class="text-xs text-gray-400">A giant fortress made of pure gold blocks and redstone doors.</p>
+                    </div>
+                </div>
+
+                <div class="gallery-item art gold-card rounded-3xl overflow-hidden group">
+                    <div class="h-52 bg-gradient-to-br from-amber-900/40 to-slate-900 relative flex items-center justify-center p-4">
+                        <div class="text-7xl group-hover:scale-125 transition-transform duration-300">🎨</div>
+                        <span class="absolute top-3 right-3 bg-amber-500 text-black font-bold text-xs px-3 py-1 rounded-full">ART</span>
+                    </div>
+                    <div class="p-6 space-y-2">
+                        <h3 class="font-luckiest text-xl text-amber-300">Cyber Dragon Drawing</h3>
+                        <p class="text-xs text-gray-400">Sketch of a mega neon dragon protecting the gold treasure!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="arcade" class="space-y-6">
+            <div class="gold-border bg-slate-950/90 rounded-3xl p-5 sm:p-6 md:p-8 space-y-6 relative overflow-hidden">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="text-center md:text-left">
+                        <div class="inline-block bg-amber-400 text-black font-luckiest px-3 py-1 rounded-lg text-xs mb-2">MINI-GAME</div>
+                        <h2 class="font-luckiest text-2xl sm:text-3xl md:text-5xl text-amber-300">HUUD'S GOLD COIN CATCHER 🪙</h2>
+                        <p class="text-gray-400 text-sm font-fredoka">Move your mouse, drag your finger, or use ← → (or A/D) to catch falling golden coins!</p>
+                    </div>
+
+                    <div class="flex items-center gap-6 bg-slate-900 px-6 py-3 rounded-2xl border border-amber-500/30">
+                        <div class="text-center">
+                            <div class="text-xs text-gray-400 font-bold uppercase">SCORE</div>
+                            <div id="game-score" class="font-luckiest text-3xl text-amber-400">0</div>
+                        </div>
+                        <div class="w-px h-8 bg-amber-500/30"></div>
+                        <div class="text-center">
+                            <div class="text-xs text-gray-400 font-bold uppercase">HIGH SCORE</div>
+                            <div id="game-highscore" class="font-luckiest text-3xl text-yellow-200">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Canvas Game Container -->
+                <div id="game-canvas-wrap" class="relative w-full bg-slate-900/90 rounded-2xl overflow-hidden border border-amber-500/30">
+                    <canvas id="game-canvas" tabindex="0" class="w-full h-full block cursor-none" role="application" aria-label="Gold coin catcher game. Use the mouse, your finger, arrow keys, or A and D to move the basket."></canvas>
+
+                    <!-- Game Start Overlay -->
+                    <div id="game-overlay" class="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-6 text-center space-y-4">
+                        <div class="text-6xl animate-bounce">🪙</div>
+                        <h3 class="font-luckiest text-2xl sm:text-3xl gold-text">READY TO PLAY?</h3>
+                        <p class="text-gray-300 text-sm max-w-sm">Catch as many gold coins as you can in 30 seconds!</p>
+                        <button type="button" id="start-game-btn" class="btn-gold px-8 py-3 rounded-2xl font-luckiest text-xl">
+                            START GAME!
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Game Settings -->
+                <div class="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 bg-slate-900/70 border border-amber-500/20 rounded-2xl px-4 sm:px-6 py-4">
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-gray-400 font-bold text-xs uppercase tracking-wide">Coin Speed</span>
+                        <div class="flex gap-1" role="group" aria-label="Coin fall speed" id="coin-speed-group">
+                            <button type="button" data-coin-speed="slow" class="speed-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-amber-300 border border-amber-500/30">Slow</button>
+                            <button type="button" data-coin-speed="normal" class="speed-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-amber-300 border border-amber-500/30">Normal</button>
+                            <button type="button" data-coin-speed="fast" class="speed-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-amber-300 border border-amber-500/30">Fast</button>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-gray-400 font-bold text-xs uppercase tracking-wide">Keyboard Speed</span>
+                        <div class="flex gap-1" role="group" aria-label="Keyboard movement speed" id="key-speed-group">
+                            <button type="button" data-key-speed="slow" class="speed-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-amber-300 border border-amber-500/30">Slow</button>
+                            <button type="button" data-key-speed="normal" class="speed-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-amber-300 border border-amber-500/30">Normal</button>
+                            <button type="button" data-key-speed="fast" class="speed-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-amber-300 border border-amber-500/30">Fast</button>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-gray-400 font-bold text-xs uppercase tracking-wide">Sound</span>
+                        <button type="button" id="sound-toggle-btn" aria-pressed="true" class="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-black">
+                            <i data-lucide="volume-2" class="w-4 h-4"></i>
+                            <span id="sound-toggle-label">On</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="trophies" class="space-y-8">
+            <div class="text-center space-y-3">
+                <h2 class="font-luckiest text-3xl sm:text-4xl md:text-6xl gold-text">TROPHY CABINET 🏆</h2>
+                <p class="font-fredoka text-lg text-gray-400">Real badges you earn by playing and exploring the site — saved on this device!</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+                <div id="trophy-champion" class="trophy-card gold-card p-5 sm:p-6 rounded-3xl text-center space-y-3 relative group">
+                    <div class="text-5xl trophy-emoji group-hover:scale-110 transition-transform">👑</div>
+                    <div class="font-luckiest text-lg text-amber-300">Gold Champion</div>
+                    <div class="text-xs text-gray-400">Play the Coin Catcher once</div>
+                    <span class="trophy-badge inline-block text-xs font-bold px-2 py-1 rounded-md border">LOCKED</span>
+                </div>
+
+                <div id="trophy-speed" class="trophy-card gold-card p-5 sm:p-6 rounded-3xl text-center space-y-3 relative group">
+                    <div class="text-5xl trophy-emoji group-hover:scale-110 transition-transform">⚡</div>
+                    <div class="font-luckiest text-lg text-amber-300">Super Speed</div>
+                    <div class="text-xs text-gray-400">Score 100+ in one game</div>
+                    <span class="trophy-badge inline-block text-xs font-bold px-2 py-1 rounded-md border">LOCKED</span>
+                </div>
+
+                <div id="trophy-lego" class="trophy-card gold-card p-5 sm:p-6 rounded-3xl text-center space-y-3 relative group">
+                    <div class="text-5xl trophy-emoji group-hover:scale-110 transition-transform">🧱</div>
+                    <div class="font-luckiest text-lg text-amber-300">Lego Genius</div>
+                    <div class="text-xs text-gray-400">Browse the Lego gallery filter</div>
+                    <span class="trophy-badge inline-block text-xs font-bold px-2 py-1 rounded-md border">LOCKED</span>
+                </div>
+
+                <div id="trophy-star" class="trophy-card gold-card p-5 sm:p-6 rounded-3xl text-center space-y-3 relative group">
+                    <div class="text-5xl trophy-emoji group-hover:scale-110 transition-transform">🌟</div>
+                    <div class="font-luckiest text-lg text-amber-300">Star Creator</div>
+                    <div class="text-xs text-gray-400">Hit Gold Blast 3 times</div>
+                    <span class="trophy-badge inline-block text-xs font-bold px-2 py-1 rounded-md border">LOCKED</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="gold-card rounded-3xl p-6 sm:p-8 md:p-12 text-center space-y-6">
+            <h2 class="font-luckiest text-2xl sm:text-3xl md:text-5xl gold-text">GIVE HUUD A HIGH FIVE! ✋</h2>
+            <p class="font-fredoka text-gray-300 text-base max-w-lg mx-auto">
+                Tap an icon for a burst of golden encouragement, right here on your screen!
+            </p>
+
+            <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 py-4">
+                <button type="button" data-highfive="👑 Super Crown!" class="highfive-btn px-5 sm:px-6 py-3 sm:py-4 rounded-2xl bg-slate-900 hover:bg-amber-500/20 border-2 border-amber-500/40 hover:border-amber-400 font-luckiest text-lg sm:text-xl text-amber-300 transition-all flex items-center gap-2">
+                    👑 Crown
+                </button>
+                <button type="button" data-highfive="🚀 Rocket Power!" class="highfive-btn px-5 sm:px-6 py-3 sm:py-4 rounded-2xl bg-slate-900 hover:bg-amber-500/20 border-2 border-amber-500/40 hover:border-amber-400 font-luckiest text-lg sm:text-xl text-amber-300 transition-all flex items-center gap-2">
+                    🚀 Rocket
+                </button>
+                <button type="button" data-highfive="⚽ Epic Goal!" class="highfive-btn px-5 sm:px-6 py-3 sm:py-4 rounded-2xl bg-slate-900 hover:bg-amber-500/20 border-2 border-amber-500/40 hover:border-amber-400 font-luckiest text-lg sm:text-xl text-amber-300 transition-all flex items-center gap-2">
+                    ⚽ Goal!
+                </button>
+                <button type="button" data-highfive="🎮 Game On!" class="highfive-btn px-5 sm:px-6 py-3 sm:py-4 rounded-2xl bg-slate-900 hover:bg-amber-500/20 border-2 border-amber-500/40 hover:border-amber-400 font-luckiest text-lg sm:text-xl text-amber-300 transition-all flex items-center gap-2">
+                    🎮 Game On
+                </button>
+            </div>
+
+            <div id="highfive-message" class="hidden font-luckiest text-xl sm:text-2xl text-amber-400 animate-bounce" aria-live="polite">
+                HIGH FIVE! 🎉
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-amber-500/20 bg-slate-950 py-8 mt-20 text-center relative z-10">
+        <div class="max-w-6xl mx-auto px-4 space-y-4">
+            <a href="https://huudgame.netlify.app/" class="font-luckiest text-2xl gold-text hover:opacity-80 transition-opacity">HUUDGAME.NETLIFY.APP</a>
+            <p class="text-sm text-gray-500">Made with ❤️ for Huud • Designed for 8-Year-Old Champions!</p>
+            <p class="text-xs text-gray-500">
+                Looking for Huud's study site instead?
+                <a href="https://huud.netlify.app/" class="text-amber-400 hover:text-amber-300 underline underline-offset-2">Visit it here</a>.
+            </p>
+            <div class="text-xs text-amber-500/60 font-mono">GOLD EDITION v3.2</div>
+        </div>
+    </footer>
+
+    <script>
+    (function () {
+        'use strict';
+
+        // ---------------------------------------------------------------
+        // Icons
+        // ---------------------------------------------------------------
+        function renderIcons() {
+            if (window.lucide) lucide.createIcons();
+        }
+        document.addEventListener('DOMContentLoaded', renderIcons);
+
+        // ---------------------------------------------------------------
+        // Mobile Menu
+        // ---------------------------------------------------------------
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        function closeMobileMenu() {
+            mobileMenu.classList.add('hidden');
+            menuBtn.setAttribute('aria-expanded', 'false');
+        }
+        function toggleMobileMenu() {
+            const isHidden = mobileMenu.classList.toggle('hidden');
+            menuBtn.setAttribute('aria-expanded', String(!isHidden));
+        }
+        menuBtn.addEventListener('click', toggleMobileMenu);
+        mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMobileMenu));
+
+        // ---------------------------------------------------------------
+        // Game Settings - sound on/off, coin fall speed, and keyboard
+        // movement speed. Persisted with localStorage so preferences
+        // stick between visits, same as the trophy/high-score system.
+        // ---------------------------------------------------------------
+        const SETTINGS_KEY = 'huud_site_settings_v1';
+        const defaultSettings = { soundOn: true, coinSpeed: 'normal', keySpeed: 'normal' };
+        function loadSettings() {
+            try {
+                const raw = localStorage.getItem(SETTINGS_KEY);
+                if (!raw) return { ...defaultSettings };
+                return { ...defaultSettings, ...JSON.parse(raw) };
+            } catch (e) {
+                return { ...defaultSettings };
+            }
+        }
+        function saveSettings() {
+            try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) { /* ignore */ }
+        }
+        let settings = loadSettings();
+
+        const COIN_SPEED_FACTORS = { slow: 0.6, normal: 1, fast: 1.7 };
+        const KEY_SPEED_VALUES = { slow: 9, normal: 16, fast: 25 };
+
+        // ---------------------------------------------------------------
+        // Shared audio: reuse a single AudioContext instead of creating
+        // a new one per tap (browsers cap concurrent contexts and will
+        // start throwing errors after enough taps on mobile Safari/Chrome).
+        // ---------------------------------------------------------------
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) {
+                const Ctx = window.AudioContext || window.webkitAudioContext;
+                if (!Ctx) return null;
+                audioCtx = new Ctx();
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        }
+        function playBeepSound(freq = 440, duration = 0.1) {
+            if (!settings.soundOn) return;
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + duration);
+            } catch (e) {
+                // Audio unavailable/blocked - fail silently, never break the page
+            }
+        }
+        // Small helper for short note sequences (jingles) built from playBeepSound
+        function playTone(freq, duration, delayMs = 0) {
+            setTimeout(() => playBeepSound(freq, duration), delayMs);
+        }
+        function playStartJingle() {
+            playTone(523.25, 0.1, 0);   // C5
+            playTone(659.25, 0.1, 110); // E5
+            playTone(783.99, 0.15, 220); // G5
+        }
+        function playEndJingle(isNewHighScore) {
+            if (isNewHighScore) {
+                playTone(659.25, 0.12, 0);   // E5
+                playTone(783.99, 0.12, 130); // G5
+                playTone(987.77, 0.22, 260); // B5 - triumphant, new record!
+            } else {
+                playTone(392.00, 0.15, 0);   // G4
+                playTone(329.63, 0.22, 160); // E4 - gentle wind-down
+            }
+        }
+        // A short burst of filtered noise for a percussive "clap" feel,
+        // used to kick off the high-five sound below.
+        function playClapSound(duration = 0.07, volume = 0.18) {
+            if (!settings.soundOn) return;
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const bufferSize = Math.max(1, Math.floor(ctx.sampleRate * duration));
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize); // decaying noise
+                }
+                const noise = ctx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = ctx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 1800;
+                filter.Q.value = 0.8;
+                const gain = ctx.createGain();
+                gain.gain.setValueAtTime(volume, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(ctx.destination);
+                noise.start();
+                noise.stop(ctx.currentTime + duration);
+            } catch (e) {
+                // Audio unavailable/blocked - fail silently, never break the page
+            }
+        }
+        // High-five sound: a quick clap "slap" followed by a bright,
+        // sparkly two-note chime - distinct from the other game jingles.
+        function playHighFiveSound() {
+            playClapSound();
+            playTone(880, 0.09, 60);     // A5
+            playTone(1174.66, 0.16, 150); // D6
+        }
+
+        // ---------------------------------------------------------------
+        // Confetti + Gold Blast
+        // ---------------------------------------------------------------
+        function triggerConfetti() {
+            if (window.confetti) {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#FBBF24', '#F59E0B', '#D97706', '#FFFBEB']
+                });
+            }
+        }
+        function triggerGoldBurst() {
+            triggerConfetti();
+            playBeepSound(587.33, 0.1);
+        }
+        window.triggerGoldBurst = triggerGoldBurst;
+
+        let highfiveTimeout = null;
+        function sendHighFive(type) {
+            triggerConfetti();
+            playHighFiveSound();
+            const msg = document.getElementById('highfive-message');
+            msg.innerText = `${type} 🎉`;
+            msg.classList.remove('hidden');
+            clearTimeout(highfiveTimeout);
+            highfiveTimeout = setTimeout(() => msg.classList.add('hidden'), 3000);
+        }
+        document.querySelectorAll('.highfive-btn').forEach(btn => {
+            btn.addEventListener('click', () => sendHighFive(btn.dataset.highfive));
+        });
+
+        // Header "Gold Blast!" button - separate from other confetti triggers
+        // so it can be counted toward the Star Creator trophy below.
+        document.getElementById('gold-blast-btn').addEventListener('click', () => {
+            triggerGoldBurst();
+            recordGoldBlast();
+        });
+
+        // ---------------------------------------------------------------
+        // Gallery Filter (fixed: no reliance on the global `event` object,
+        // which is undefined/unreliable in some mobile browsers)
+        // ---------------------------------------------------------------
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        const galleryBtns = document.querySelectorAll('.gallery-btn');
+
+        function filterGallery(category, activeBtn) {
+            galleryBtns.forEach(btn => {
+                btn.classList.remove('bg-amber-500', 'text-black', 'active');
+                btn.classList.add('bg-slate-900', 'text-amber-300');
+            });
+            activeBtn.classList.remove('bg-slate-900', 'text-amber-300');
+            activeBtn.classList.add('bg-amber-500', 'text-black', 'active');
+
+            galleryItems.forEach(item => {
+                const show = category === 'all' || item.classList.contains(category);
+                item.style.display = show ? '' : 'none';
+            });
+        }
+        galleryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterGallery(btn.dataset.filter, btn);
+                if (btn.dataset.filter === 'lego') recordLegoFilterUsed();
+            });
+        });
+
+        // ---------------------------------------------------------------
+        // Floating Gold Particles Background (DPI-aware, debounced resize)
+        // ---------------------------------------------------------------
+        const bgCanvas = document.getElementById('bg-canvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let bgParticles = [];
+        let bgCssW = 0, bgCssH = 0;
+
+        function resizeBgCanvas() {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            bgCssW = window.innerWidth;
+            bgCssH = window.innerHeight;
+            bgCanvas.width = Math.round(bgCssW * dpr);
+            bgCanvas.height = Math.round(bgCssH * dpr);
+            bgCanvas.style.width = bgCssW + 'px';
+            bgCanvas.style.height = bgCssH + 'px';
+            bgCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        class BgParticle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * bgCssW;
+                this.y = Math.random() * bgCssH;
+                this.size = Math.random() * 3 + 1;
+                this.speedY = -(Math.random() * 0.8 + 0.2);
+                this.opacity = Math.random() * 0.6 + 0.2;
+            }
+            update() {
+                this.y += this.speedY;
+                if (this.y < 0) this.y = bgCssH;
+            }
+            draw() {
+                bgCtx.fillStyle = `rgba(245, 158, 11, ${this.opacity})`;
+                bgCtx.beginPath();
+                bgCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                bgCtx.fill();
+            }
+        }
+
+        function initBgParticles() {
+            bgParticles = [];
+            for (let i = 0; i < 40; i++) bgParticles.push(new BgParticle());
+        }
+
+        const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function animateBgParticles() {
+            bgCtx.clearRect(0, 0, bgCssW, bgCssH);
+            bgParticles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateBgParticles);
+        }
+
+        resizeBgCanvas();
+        initBgParticles();
+        if (!prefersReducedMotion) {
+            requestAnimationFrame(animateBgParticles);
+        } else {
+            bgCanvas.style.display = 'none';
+        }
+
+        // ---------------------------------------------------------------
+        // Site Stats & Trophies - persisted with localStorage so progress
+        // (high score + unlocked trophies) survives page reloads and
+        // future visits, instead of resetting every time like before.
+        // ---------------------------------------------------------------
+        const STATS_KEY = 'huud_site_stats_v1';
+        const defaultStats = { highScore: 0, gamesPlayed: 0, goldBlasts: 0, legoFilterUsed: false };
+
+        function loadStats() {
+            try {
+                const raw = localStorage.getItem(STATS_KEY);
+                if (!raw) return { ...defaultStats };
+                return { ...defaultStats, ...JSON.parse(raw) };
+            } catch (e) {
+                return { ...defaultStats };
+            }
+        }
+        function saveStats(stats) {
+            try {
+                localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+            } catch (e) {
+                // localStorage unavailable (private browsing, etc.) - trophies
+                // just won't persist across reloads; the page still works.
+            }
+        }
+
+        let stats = loadStats();
+
+        const TROPHIES = [
+            { id: 'trophy-champion', test: s => s.gamesPlayed >= 1 },
+            { id: 'trophy-speed', test: s => s.highScore >= 100 },
+            { id: 'trophy-lego', test: s => s.legoFilterUsed },
+            { id: 'trophy-star', test: s => s.goldBlasts >= 3 },
+        ];
+
+        function renderTrophies() {
+            TROPHIES.forEach(t => {
+                const card = document.getElementById(t.id);
+                if (!card) return;
+                const badge = card.querySelector('.trophy-badge');
+                const unlocked = t.test(stats);
+                card.classList.toggle('opacity-50', !unlocked);
+                card.classList.toggle('grayscale', !unlocked);
+                if (unlocked) {
+                    badge.textContent = 'UNLOCKED';
+                    badge.className = 'trophy-badge inline-block text-xs font-bold px-2 py-1 rounded-md border bg-amber-500/20 text-amber-400 border-amber-500/40';
+                } else {
+                    badge.textContent = 'LOCKED';
+                    badge.className = 'trophy-badge inline-block text-xs font-bold px-2 py-1 rounded-md border bg-slate-800 text-gray-500 border-gray-600/40';
+                }
+            });
+        }
+
+        function recordGoldBlast() {
+            stats.goldBlasts += 1;
+            saveStats(stats);
+            renderTrophies();
+        }
+        function recordLegoFilterUsed() {
+            if (!stats.legoFilterUsed) {
+                stats.legoFilterUsed = true;
+                saveStats(stats);
+                renderTrophies();
+            }
+        }
+        function recordGamePlayed() {
+            stats.gamesPlayed += 1;
+            saveStats(stats);
+            renderTrophies();
+        }
+        function recordScore(score) {
+            if (score > stats.highScore) {
+                stats.highScore = score;
+                saveStats(stats);
+            }
+            renderTrophies();
+        }
+
+        renderTrophies();
+
+        // ---------------------------------------------------------------
+        // Interactive Gold Coin Catcher Game
+        // DPI-aware canvas + touch coordinates kept in CSS pixel space so
+        // the coin/basket collision math always matches what's on screen,
+        // on phones, iPad, and desktop alike.
+        // ---------------------------------------------------------------
+        const gameCanvasWrap = document.getElementById('game-canvas-wrap');
+        const gameCanvas = document.getElementById('game-canvas');
+        const gameCtx = gameCanvas.getContext('2d');
+        const scoreEl = document.getElementById('game-score');
+        const highScoreEl = document.getElementById('game-highscore');
+        const overlay = document.getElementById('game-overlay');
+        const overlayHeading = overlay.querySelector('h3');
+
+        let gameScore = 0;
+        let gameHighScore = stats.highScore; // restored from localStorage
+        highScoreEl.innerText = String(gameHighScore);
+        let isPlaying = false;
+        let coins = [];
+        let cssW = 0, cssH = 0;
+        let playerX = 0;
+        let gameTimer = 30;
+        let gameInterval = null;
+        let rafId = null;
+
+        function resizeGameCanvas() {
+            const rect = gameCanvasWrap.getBoundingClientRect();
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            cssW = Math.max(rect.width, 1);
+            cssH = Math.max(rect.height, 1);
+            gameCanvas.width = Math.round(cssW * dpr);
+            gameCanvas.height = Math.round(cssH * dpr);
+            gameCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            if (playerX === 0) playerX = cssW / 2;
+            playerX = Math.min(Math.max(playerX, 0), cssW);
+        }
+
+        function handlePointerMove(clientX) {
+            const rect = gameCanvas.getBoundingClientRect();
+            playerX = Math.min(Math.max(clientX - rect.left, 0), cssW);
+        }
+
+        gameCanvas.addEventListener('mousemove', (e) => handlePointerMove(e.clientX));
+        gameCanvas.addEventListener('touchmove', (e) => {
+            if (e.touches && e.touches[0]) {
+                handlePointerMove(e.touches[0].clientX);
+            }
+            e.preventDefault(); // stop the page from scrolling while playing
+        }, { passive: false });
+        gameCanvas.addEventListener('touchstart', (e) => {
+            if (e.touches && e.touches[0]) {
+                handlePointerMove(e.touches[0].clientX);
+            }
+        }, { passive: true });
+
+        // --- Keyboard controls: Arrow Left/Right and A/D, held to move ---
+        let KEY_SPEED = KEY_SPEED_VALUES[settings.keySpeed]; // px per animation frame, adjustable in Settings
+        const keysHeld = { left: false, right: false };
+        const MOVE_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'a', 'A', 'd', 'D']);
+        // Every key a browser might use to scroll the page - blocked during play
+        // so pressing Down (or Up/Space/etc.) can never scroll the game out of
+        // view, even though only Left/Right/A/D actually move the basket.
+        const SCROLL_BLOCK_KEYS = new Set(['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' ', 'Spacebar', 'PageUp', 'PageDown', 'Home', 'End']);
+
+        gameCanvas.addEventListener('keydown', (e) => {
+            if (!isPlaying) return;
+            if (SCROLL_BLOCK_KEYS.has(e.key)) e.preventDefault(); // stop the page from scrolling mid-game
+            if (!MOVE_KEYS.has(e.key)) return;
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keysHeld.left = true;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keysHeld.right = true;
+        });
+        gameCanvas.addEventListener('keyup', (e) => {
+            if (!MOVE_KEYS.has(e.key)) return;
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keysHeld.left = false;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keysHeld.right = false;
+        });
+        // If focus is lost mid-press (e.g. tabbing away), don't leave a key "stuck"
+        gameCanvas.addEventListener('blur', () => {
+            keysHeld.left = false;
+            keysHeld.right = false;
+        });
+
+        function applyKeyboardMovement() {
+            if (keysHeld.left) playerX = Math.max(playerX - KEY_SPEED, 0);
+            if (keysHeld.right) playerX = Math.min(playerX + KEY_SPEED, cssW);
+        }
+
+        function startGame() {
+            resizeGameCanvas();
+            overlay.classList.add('hidden');
+            gameScore = 0;
+            scoreEl.innerText = '0';
+            coins = [];
+            gameTimer = 30;
+            keysHeld.left = false;
+            keysHeld.right = false;
+            gameCanvas.focus();
+            playStartJingle();
+
+            clearInterval(gameInterval);
+            gameInterval = setInterval(() => {
+                gameTimer -= 1;
+                if (gameTimer <= 0) endGame();
+            }, 1000);
+
+            if (!isPlaying) {
+                isPlaying = true;
+                if (rafId) cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(runGameLoop);
+            }
+
+            recordGamePlayed();
+        }
+
+        function endGame() {
+            isPlaying = false;
+            clearInterval(gameInterval);
+            gameInterval = null;
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+            const isNewHighScore = gameScore > gameHighScore;
+            if (isNewHighScore) {
+                gameHighScore = gameScore;
+                highScoreEl.innerText = String(gameHighScore);
+            }
+            recordScore(gameScore);
+            overlay.classList.remove('hidden');
+            overlayHeading.innerText = `TIME'S UP! SCORE: ${gameScore}`;
+            triggerConfetti();
+            playEndJingle(isNewHighScore);
+        }
+
+        function spawnCoin() {
+            if (Math.random() < 0.08) {
+                coins.push({
+                    x: Math.random() * (cssW - 20) + 10,
+                    y: -20,
+                    speed: (Math.random() * 3 + 2) * COIN_SPEED_FACTORS[settings.coinSpeed],
+                    size: 16
+                });
+            }
+        }
+
+        // ctx.roundRect() is missing on iOS Safari < 16.4 and some older
+        // Android WebViews - calling it there throws and freezes the game
+        // loop mid-frame, which is what was causing the game to appear
+        // "not loaded" on mobile. This draws the same shape by hand instead.
+        function drawRoundedRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            if (typeof ctx.roundRect === 'function') {
+                ctx.roundRect(x, y, width, height, radius);
+                return;
+            }
+            const r = Math.min(radius, width / 2, height / 2);
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + width - r, y);
+            ctx.arcTo(x + width, y, x + width, y + r, r);
+            ctx.lineTo(x + width, y + height - r);
+            ctx.arcTo(x + width, y + height, x + width - r, y + height, r);
+            ctx.lineTo(x + r, y + height);
+            ctx.arcTo(x, y + height, x, y + height - r, r);
+            ctx.lineTo(x, y + r);
+            ctx.arcTo(x, y, x + r, y, r);
+            ctx.closePath();
+        }
+
+        function runGameLoop() {
+            if (!isPlaying) return;
+
+            try {
+                applyKeyboardMovement();
+
+                gameCtx.clearRect(0, 0, cssW, cssH);
+
+                // Player basket
+                gameCtx.fillStyle = '#F59E0B';
+                gameCtx.shadowBlur = 15;
+                gameCtx.shadowColor = '#FBBF24';
+                drawRoundedRect(gameCtx, playerX - 35, cssH - 25, 70, 18, 10);
+                gameCtx.fill();
+                gameCtx.shadowBlur = 0;
+
+                spawnCoin();
+
+                for (let i = coins.length - 1; i >= 0; i--) {
+                    const c = coins[i];
+                    c.y += c.speed;
+
+                    gameCtx.fillStyle = '#FBBF24';
+                    gameCtx.beginPath();
+                    gameCtx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
+                    gameCtx.fill();
+                    gameCtx.strokeStyle = '#D97706';
+                    gameCtx.lineWidth = 3;
+                    gameCtx.stroke();
+
+                    gameCtx.fillStyle = '#000000';
+                    gameCtx.font = 'bold 12px Outfit';
+                    gameCtx.textAlign = 'center';
+                    gameCtx.textBaseline = 'middle';
+                    gameCtx.fillText('$', c.x, c.y);
+
+                    if (
+                        c.y + c.size >= cssH - 25 &&
+                        c.x >= playerX - 45 &&
+                        c.x <= playerX + 45
+                    ) {
+                        gameScore += 10;
+                        scoreEl.innerText = String(gameScore);
+                        playBeepSound(820 + Math.random() * 160, 0.05);
+                        coins.splice(i, 1);
+                    } else if (c.y > cssH) {
+                        coins.splice(i, 1);
+                    }
+                }
+
+                gameCtx.fillStyle = '#F3F4F6';
+                gameCtx.font = 'bold 18px Fredoka';
+                gameCtx.textAlign = 'left';
+                gameCtx.fillText(`⏱️ Time: ${gameTimer}s`, 15, 30);
+            } catch (err) {
+                // Never let a single bad frame permanently freeze the game -
+                // log it and keep the loop alive for the next frame instead.
+                console.error('Coin Catcher render error:', err);
+            }
+
+            rafId = requestAnimationFrame(runGameLoop);
+        }
+
+        document.getElementById('start-game-btn').addEventListener('click', startGame);
+
+        // ---------------------------------------------------------------
+        // Settings panel: Coin Speed / Keyboard Speed / Sound toggle
+        // ---------------------------------------------------------------
+        const ACTIVE_SPEED_CLASSES = ['bg-amber-500', 'text-black'];
+        const INACTIVE_SPEED_CLASSES = ['bg-slate-800', 'text-amber-300', 'border', 'border-amber-500/30'];
+
+        function setActiveSpeedButton(groupId, value) {
+            document.querySelectorAll(`#${groupId} .speed-btn`).forEach(btn => {
+                const isActive = btn.dataset.coinSpeed === value || btn.dataset.keySpeed === value;
+                ACTIVE_SPEED_CLASSES.forEach(c => btn.classList.toggle(c, isActive));
+                INACTIVE_SPEED_CLASSES.forEach(c => btn.classList.toggle(c, !isActive));
+            });
+        }
+
+        document.querySelectorAll('#coin-speed-group .speed-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                settings.coinSpeed = btn.dataset.coinSpeed;
+                saveSettings();
+                setActiveSpeedButton('coin-speed-group', settings.coinSpeed);
+            });
+        });
+
+        document.querySelectorAll('#key-speed-group .speed-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                settings.keySpeed = btn.dataset.keySpeed;
+                KEY_SPEED = KEY_SPEED_VALUES[settings.keySpeed];
+                saveSettings();
+                setActiveSpeedButton('key-speed-group', settings.keySpeed);
+            });
+        });
+
+        const soundToggleBtn = document.getElementById('sound-toggle-btn');
+        const soundToggleLabel = document.getElementById('sound-toggle-label');
+        function renderSoundToggle() {
+            soundToggleBtn.setAttribute('aria-pressed', String(settings.soundOn));
+            soundToggleLabel.textContent = settings.soundOn ? 'On' : 'Off';
+            soundToggleBtn.classList.toggle('bg-amber-500', settings.soundOn);
+            soundToggleBtn.classList.toggle('text-black', settings.soundOn);
+            soundToggleBtn.classList.toggle('bg-slate-800', !settings.soundOn);
+            soundToggleBtn.classList.toggle('text-amber-300', !settings.soundOn);
+            const icon = soundToggleBtn.querySelector('[data-lucide]');
+            if (icon) {
+                icon.setAttribute('data-lucide', settings.soundOn ? 'volume-2' : 'volume-x');
+                renderIcons(); // re-render this swapped icon
+            }
+        }
+        soundToggleBtn.addEventListener('click', () => {
+            settings.soundOn = !settings.soundOn;
+            saveSettings();
+            renderSoundToggle();
+            if (settings.soundOn) playBeepSound(659.25, 0.08); // quick confirmation blip
+        });
+
+        // Reflect whatever was loaded from localStorage on first paint
+        setActiveSpeedButton('coin-speed-group', settings.coinSpeed);
+        setActiveSpeedButton('key-speed-group', settings.keySpeed);
+        renderSoundToggle();
+
+        // ---------------------------------------------------------------
+        // Debounced global resize handling for both canvases
+        // ---------------------------------------------------------------
+        let resizeRaf = null;
+        function handleResize() {
+            if (resizeRaf) cancelAnimationFrame(resizeRaf);
+            resizeRaf = requestAnimationFrame(() => {
+                resizeBgCanvas();
+                resizeGameCanvas();
+            });
+        }
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('orientationchange', handleResize);
+
+        // Initial game canvas sizing (element must be laid out first)
+        document.addEventListener('DOMContentLoaded', resizeGameCanvas);
+        resizeGameCanvas();
+    })();
+    </script>
+</body>
+</html>
