@@ -163,7 +163,7 @@ Status values: `TODO` / `WIP` / `DONE`.
 | 8 | Game 6 — Ice Cream Inc. | DONE | Found the reserved-wire-key bug; see docs/PROTOCOL.md |
 | 9 | Game 7 — Train Race | DONE | |
 | 10 | Game 8 — Baby Cleaning | DONE | |
-| 11 | Game 9 — Bus Cleaning | TODO | |
+| 11 | Game 9 — Bus Cleaning | DONE | Ray/box cast lives in `shared/bus.js`; the reticle and the scrub use the same maths |
 | 12 | Game 10 — Collecting Car Coins | TODO | |
 | 13 | Game 11 — Guess Animal | TODO | |
 | 14 | Game 12 — Science Game | TODO | |
