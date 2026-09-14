@@ -164,7 +164,7 @@ Status values: `TODO` / `WIP` / `DONE`.
 | 9 | Game 7 — Train Race | DONE | |
 | 10 | Game 8 — Baby Cleaning | DONE | |
 | 11 | Game 9 — Bus Cleaning | DONE | Ray/box cast lives in `shared/bus.js`; the reticle and the scrub use the same maths |
-| 12 | Game 10 — Collecting Car Coins | TODO | |
+| 12 | Game 10 — Collecting Car Coins | DONE | |
 | 13 | Game 11 — Guess Animal | TODO | |
 | 14 | Game 12 — Science Game | TODO | |
 | 15 | Game 13 — Barber Game | TODO | |
