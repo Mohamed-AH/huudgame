@@ -98,6 +98,12 @@ const ACTIONS = {
         return null;
     },
     'guess-animal': () => ({ a: 'answer', i: Math.floor(rand(0, 4)) }),
+    'science-lab': () => {
+        const roll = Math.random();
+        if (roll < 0.65) return { a: 'add', e: Math.floor(rand(0, 8)) };
+        if (roll < 0.95) return { a: 'mix' };
+        return { a: 'clear' };
+    },
     'voxel-sandbox': () => (Math.random() < 0.5
         ? { a: 'mine', x: Math.floor(rand(0, 28)), y: Math.floor(rand(1, 8)), z: Math.floor(rand(0, 28)) }
         : { a: 'place', x: Math.floor(rand(0, 28)), y: Math.floor(rand(1, 8)), z: Math.floor(rand(0, 28)), b: Math.ceil(rand(1, 6)) }),

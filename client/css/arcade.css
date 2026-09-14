@@ -479,6 +479,47 @@ input[type="text"]:focus { border-color: var(--amber); }
 }
 .ticket .fuse { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--good); transition: width 0.3s linear; }
 
+/* The science lab's order card, beaker drop zone and drag ghost. */
+.lab-card { background: rgba(0, 0, 0, 0.72); border: 1px solid var(--line); border-radius: 0.6rem; padding: 0.3rem 0.8rem; text-align: center; font-size: 0.78rem; }
+.lab-card b { display: block; color: var(--gold); font-size: 0.95rem; }
+.lab-card span { color: var(--muted); }
+
+.beaker-zone {
+    min-height: 2.6rem;
+    width: min(20rem, 80vw);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    border: 2px dashed rgba(245, 158, 11, 0.45);
+    border-radius: 0.7rem;
+    background: rgba(0, 0, 0, 0.55);
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+.beaker-zone.over { border-color: var(--good); background: rgba(6, 214, 160, 0.18); }
+.beaker-zone i {
+    font-style: normal;
+    font-weight: 800;
+    font-size: 0.8rem;
+    color: #0b0c10;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.4rem;
+}
+
+.drag-ghost {
+    position: fixed;
+    z-index: 80;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    font-weight: 800;
+    font-size: 0.9rem;
+    color: #0b0c10;
+    padding: 0.35rem 0.6rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
 /* A pointer-capable device with a keyboard does not need thumb controls. */
 @media (hover: hover) and (pointer: fine) {
     .touch-controls { display: none; }
