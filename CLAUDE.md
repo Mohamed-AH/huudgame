@@ -28,8 +28,10 @@ This build is long. A session may be interrupted at any point. To restart safely
 1. `git log --oneline -15` — every completed unit of work is its own commit.
 2. Read **§5 Phase tracker** below. The first phase not marked `DONE` is the next task.
 3. `npm install` (root) if `node_modules/` is missing.
-4. `npm run verify` — static checks (syntax-parse every JS file, registry integrity).
-5. `npm start` then open `http://localhost:8080/` to sanity-check the lobby.
+4. `npm run check` — `verify` (parse every file, registries agree) then `smoke`
+   (boots the real server, drives 4 bot clients through a full round of every
+   registered game). Both must pass before any commit.
+5. `npm start` then open `http://localhost:8080/play/` to sanity-check the lobby.
 6. Continue from the first non-`DONE` phase. Update §5 **in the same commit** that
    completes the work, so the tracker and the tree never disagree.
 
@@ -37,9 +39,10 @@ This build is long. A session may be interrupted at any point. To restart safely
 
 - One phase (or one game) per commit. Never leave a half-written game committed —
   if a game is partially done, mark it `WIP` in §5 with a note on exactly what remains.
-- Never break the lobby. `npm run verify` must pass before every commit.
+- Never break the lobby. `npm run check` must pass before every commit.
 - A game is `DONE` only when: server module + client module exist, it is listed in
-  both registries, `npm run verify` passes, and it has an entry in `docs/GDD.md`.
+  both registries, `npm run check` passes with that game exercised, and it has an
+  entry in `docs/GDD.md`.
 - Additive edits only to `huud-website.html`; never reformat it wholesale.
 
 ---
@@ -55,6 +58,11 @@ server/src/room.js      Room: 14 slots, host, phase machine, tick loop, broadcas
 server/src/rooms.js     Room registry (create / join by code / reap empty).
 server/src/player.js    Connected player + per-socket send helpers.
 server/src/games/       One authoritative module per game + registry.js.
+                        registry.js imports every game once at boot; a game that
+                        throws is skipped and logged, never fatal.
+
+tools/verify.js         Parse + registry cross-check.
+tools/smoke.js          Real server, real sockets, one full round per game.
 
 client/index.html       Arcade shell: lobby UI, HUD chrome, <canvas>, importmap.
 client/js/main.js       Boot: net -> lobby -> load game module -> run loop.
@@ -121,6 +129,8 @@ export function create(ctx) {           // ctx = {THREE, scene, camera, renderer
 | `npm install` | Installs `ws` (server) and `three` (served to the client from `node_modules`). |
 | `npm start` | Runs the arcade on `http://localhost:8080` (override with `PORT`). |
 | `npm run verify` | Syntax-parses every JS file and checks both game registries agree. |
+| `npm run smoke` | Boots the server on a scratch port and plays every registered game with bot clients. Pass game ids to narrow it: `node tools/smoke.js mango-target`. |
+| `npm run check` | `verify` then `smoke`. This is the pre-commit gate. |
 
 `three` is served by the server at `/vendor/three/` straight out of `node_modules`,
 so the client uses a bare `import ... from 'three'` via an importmap. No CDN.
@@ -134,7 +144,7 @@ Status values: `TODO` / `WIP` / `DONE`.
 | # | Phase | Status | Notes |
 |---|---|---|---|
 | 0 | Foundations: layout, `CLAUDE.md`, GDD, protocol doc, package.json, verify script | DONE | |
-| 1 | Server core: rooms, 14 slots, phase machine, tick loop, static serving | TODO | |
+| 1 | Server core: rooms, 14 slots, phase machine, tick loop, static serving | DONE | `tools/smoke.js` added alongside |
 | 2 | Client core: engine, net, input, HUD, lobby, game loader | TODO | |
 | 3 | Game 1 — Guess a Number | TODO | |
 | 4 | Game 2 — Voxel Sandbox (Minecraft) | TODO | |

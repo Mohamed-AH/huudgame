@@ -4,11 +4,15 @@
   "description": "HUUD Family Arcade - 14-player cross-platform Three.js + WebSocket party games",
   "type": "module",
   "private": true,
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "node server/src/index.js",
     "dev": "node --watch server/src/index.js",
-    "verify": "node tools/verify.js"
+    "verify": "node tools/verify.js",
+    "smoke": "node tools/smoke.js",
+    "check": "node tools/verify.js && node tools/smoke.js"
   },
   "dependencies": {
     "three": "^0.186.0",
