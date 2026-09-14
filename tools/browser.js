@@ -182,6 +182,14 @@ try {
             });
         }
 
+        // Mid-round is the interesting frame; the results screen looks the same for
+        // every game and tells us nothing about whether the scene was built well.
+        if (SHOTS) {
+            await host.page.waitForTimeout(3500);
+            await host.page.screenshot({ path: join(SHOT_DIR, `${id}.png`) });
+            await guests[0].page.screenshot({ path: join(SHOT_DIR, `${id}-phone.png`) });
+        }
+
         let ended = false;
         try {
             await host.page.waitForSelector('#screen-results:not([hidden])', { timeout: 25000 });
@@ -196,10 +204,13 @@ try {
         const drawCalls = await host.page.evaluate(() => window.arcade.engine?.renderer?.info?.render?.calls ?? -1);
         if (ended && clean) ok(`${id}: played, results shown, ${drawCalls} draw calls`);
         if (drawCalls > 220) fail(`${id}: ${drawCalls} draw calls is over the mobile budget`);
-        if (SHOTS) await host.page.screenshot({ path: join(SHOT_DIR, `${id}.png`) });
 
+        // Returning to the lobby view is local; the room only leaves RESULTS when the
+        // host picks again, and that is also what tears the 3D scene down.
         await host.page.click('#back-lobby-btn');
-        await host.page.waitForTimeout(400);
+        await host.page.click(`.game-tile[data-game-id="${id}"]`);
+        await host.page.waitForFunction(() => window.arcade.room?.phase === 'lobby' && !window.arcade.game,
+            null, { timeout: 10000 }).catch(() => fail(`${id}: room never returned to the lobby`));
     }
 
     console.log('\nbrowser: teardown');
@@ -209,7 +220,9 @@ try {
     });
     // Back in the lobby only the idle backdrop should be resident. A number in the
     // hundreds here means a game's dispose() is not releasing its scene graph.
-    if (leaked.geometries < 60 && leaked.textures < 40) ok(`memory released (${leaked.geometries} geometries, ${leaked.textures} textures)`);
+    // The idle backdrop alone is 2 geometries and 1 texture; anything much above that
+    // means a game's dispose() is not releasing its scene graph.
+    if (leaked.geometries <= 12 && leaked.textures <= 6) ok(`memory released (${leaked.geometries} geometries, ${leaked.textures} textures)`);
     else fail(`possible leak: ${leaked.geometries} geometries, ${leaked.textures} textures still resident`);
 
     for (const p of everyone) await p.context.close();

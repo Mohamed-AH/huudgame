@@ -99,10 +99,13 @@
 
     <div class="hud-banner" id="hud-banner" aria-live="polite"></div>
     <div class="hud-objective" id="hud-objective"></div>
-    <div class="hud-toasts" id="hud-toasts" aria-live="polite"></div>
-
-    <!-- Games inject their own controls here (keypads, toppings, throttles). -->
-    <div class="hud-panel" id="hud-panel"></div>
+    <!-- Toasts stack directly above whatever controls the game put up, so a tall
+         keypad can never bury them. -->
+    <div class="hud-bottom">
+        <div class="hud-toasts" id="hud-toasts" aria-live="polite"></div>
+        <!-- Games inject their own controls here (keypads, toppings, throttles). -->
+        <div class="hud-panel" id="hud-panel"></div>
+    </div>
 
     <aside class="scorepad" id="scorepad" hidden>
         <h3>Scores</h3>

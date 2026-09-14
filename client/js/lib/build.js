@@ -96,6 +96,33 @@ export function arenaFloor(radius = 22, inner = COLORS.floor, outer = COLORS.nig
     return mesh;
 }
 
+/**
+ * A gradient dome behind everything. Without it the upper half of most shots is flat
+ * black, which reads as "unfinished" rather than "night". One sphere, one 2x256
+ * texture, drawn back-side with lighting off - essentially free.
+ */
+export function skyDome(top = 0x1b2440, bottom = 0x0b0c10, radius = 95) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 2;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    const grad = ctx.createLinearGradient(0, 0, 0, 256);
+    grad.addColorStop(0, '#' + top.toString(16).padStart(6, '0'));
+    grad.addColorStop(0.62, '#' + bottom.toString(16).padStart(6, '0'));
+    grad.addColorStop(1, '#' + bottom.toString(16).padStart(6, '0'));
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 2, 256);
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const dome = new THREE.Mesh(
+        new THREE.SphereGeometry(radius, 16, 12),
+        new THREE.MeshBasicMaterial({ map: tex, side: THREE.BackSide, fog: false, depthWrite: false }),
+    );
+    dome.renderOrder = -1;
+    return dome;
+}
+
 export function gridFloor(size = 40, divisions = 20, color = 0x2a3550) {
     const grid = new THREE.GridHelper(size, divisions, color, color);
     grid.material.opacity = 0.35;

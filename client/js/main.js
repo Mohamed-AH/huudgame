@@ -166,6 +166,7 @@ async function startGame(msg) {
 net.on(S2C.ROOM, (msg) => {
     const previous = room;
     room = msg;
+    hud?.setRoom(msg.code);
     hud?.setPlayers(msg.players);
     lobby.onRoom(msg);
 

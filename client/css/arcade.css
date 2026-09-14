@@ -271,16 +271,24 @@ input[type="text"]:focus { border-color: var(--amber); }
 }
 .hud-objective:empty { display: none; }
 
-.hud-toasts {
+.hud-bottom {
     position: absolute;
-    bottom: calc(9rem + var(--safe-b));
+    bottom: calc(0.8rem + var(--safe-b));
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 0.6rem;
+    width: min(92vw, 30rem);
+    pointer-events: none;
+}
+
+.hud-toasts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 0.3rem;
-    width: 90%;
 }
 .toast {
     font-size: 0.84rem;
@@ -296,16 +304,12 @@ input[type="text"]:focus { border-color: var(--amber); }
 @keyframes toastOut { to { opacity: 0; transform: translateY(-8px); } }
 
 .hud-panel {
-    position: absolute;
-    bottom: calc(0.8rem + var(--safe-b));
-    left: 50%;
-    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
     pointer-events: auto;
-    max-width: min(92vw, 30rem);
+    width: 100%;
 }
 .hud-panel:empty { display: none; }
 

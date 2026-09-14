@@ -152,7 +152,7 @@ Status values: `TODO` / `WIP` / `DONE`.
 | 0 | Foundations: layout, `CLAUDE.md`, GDD, protocol doc, package.json, verify script | DONE | |
 | 1 | Server core: rooms, 14 slots, phase machine, tick loop, static serving | DONE | `tools/smoke.js` added alongside |
 | 2 | Client core: engine, net, input, HUD, lobby, game loader | DONE | `tools/browser.js` added alongside |
-| 3 | Game 1 — Guess a Number | TODO | |
+| 3 | Game 1 — Guess a Number | DONE | |
 | 4 | Game 2 — Voxel Sandbox (Minecraft) | TODO | |
 | 5 | Game 3 — Car Race | TODO | |
 | 6 | Game 4 — Mango Target | TODO | |
@@ -177,3 +177,15 @@ Status values: `TODO` / `WIP` / `DONE`.
 - Game ids are kebab-case and identical on both sides (`guess-number`, `mango-target`).
 - Keep per-tick payloads small: short keys, numbers rounded to 2 decimals.
 - Comments explain *why*, not *what*. Match the density of surrounding code.
+
+### Per-game checklist (follow this for every game)
+
+1. `server/src/games/<id>.js` — rules, scoring, and a `snapshot()` carrying `tl`.
+2. `client/js/games/<id>.js` — scene, controls, and a `dispose()` that releases every
+   cloned material and canvas texture the shared cache never saw.
+3. Add a bot script for the game in `ACTIONS` in `tools/smoke.js`, or its scoring path
+   is never exercised by any test.
+4. `node tools/verify.js && node tools/smoke.js <id> && SHOTS=1 node tools/browser.js <id>`.
+5. **Look at `.shots/<id>.png`.** Every game so far has needed camera framing fixed
+   after seeing the first real frame; the tests pass long before the shot looks right.
+6. Mark the phase DONE in §5 and commit.

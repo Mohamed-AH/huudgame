@@ -38,6 +38,7 @@ class Bot {
         this.last = new Map();       // message type -> payload
         this.errors = [];
         this.stateTicks = 0;
+        this.seq = 0;
     }
 
     connect() {
@@ -78,6 +79,15 @@ class Bot {
         throw new Error(`${this.name}: timed out waiting for "${type}"`);
     }
 }
+
+/**
+ * Per-game bot behaviour. Without these the smoke test only ever exercises movement,
+ * and every scoring path in every game would go untested.
+ */
+const rand = (lo, hi) => lo + Math.random() * (hi - lo);
+const ACTIONS = {
+    'guess-number': () => ({ a: 'guess', v: Math.ceil(rand(1, 100)) }),
+};
 
 // ------------------------------------------------------------------ the server
 
@@ -161,19 +171,26 @@ try {
     if (!games.length && wanted.length) fail(`no registered game matches ${wanted.join(', ')}`);
 
     for (const game of games) {
-        const before = { state: host.count(S2C.STATE), end: host.count(S2C.END) };
+        const before = {
+            state: host.count(S2C.STATE), end: host.count(S2C.END),
+            picked: host.count(S2C.PICKED), start: host.count(S2C.START),
+        };
         host.send({ t: C2S.PICK, gameId: game.id });
-        await host.await(S2C.PICKED, 3000, host.count(S2C.PICKED) - 1);
+        await host.await(S2C.PICKED, 3000, before.picked);
         host.send({ t: C2S.START });
 
-        const start = await host.await(S2C.START, 5000, host.count(S2C.START) - 1);
+        const start = await host.await(S2C.START, 5000, before.start);
         if (!start.full) { fail(`${game.id}: START carried no fullState`); continue; }
 
-        // Flail plausibly so the tick loop actually has work to do.
+        // Flail plausibly so the tick loop actually has work to do, and fire the
+        // game's own discrete actions so scoring paths are exercised, not just movement.
+        const act = ACTIONS[game.id];
         const flail = setInterval(() => {
             for (const [i, b] of bots.entries()) {
                 const p = Date.now() / 700 + i;
                 b.send({ t: C2S.INPUT, ax: Math.cos(p), ay: Math.sin(p), b: i % 2 });
+                const action = act?.(i);
+                if (action) b.send({ t: C2S.ACTION, n: ++b.seq, ...action });
             }
         }, 60);
 
@@ -192,7 +209,8 @@ try {
             if (!placesOk) fail(`${game.id}: results places are not 1..n`);
             const phase = host.last.get(S2C.ROOM)?.phase;
             if (phase !== PHASE.RESULTS) fail(`${game.id}: phase is "${phase}" after END`);
-            ok(`${game.id}: ${ticks} ticks, ended "${ended.reason}", ${ended.results.length} results`);
+            const top = ended.results[0]?.score ?? 0;
+            ok(`${game.id}: ${ticks} ticks, ended "${ended.reason}", top score ${top}`);
         }
         if (ticks === 0) fail(`${game.id}: broadcast no state at all`);
 
