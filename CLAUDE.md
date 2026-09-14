@@ -75,6 +75,9 @@ client/js/lobby.js      Join screen, room code, roster, game picker, ready-up.
 client/js/lib/build.js  Shared low-poly primitives, avatars, nameplates, arena floors.
 client/js/lib/interp.js SnapshotBuffer (renders 100ms in the past), damp, lerpAngle.
 client/js/lib/fx.js     Pooled InstancedMesh particles + synthesized sound.
+client/js/lib/crew.js   One avatar per player, interpolated from [slot,x,z,rot,...]
+                        rows, plus the shared chase camera. Used by every game where
+                        people walk or drive.
 client/js/games/        One client module per game + registry.js.
 ```
 
@@ -156,7 +159,7 @@ Status values: `TODO` / `WIP` / `DONE`.
 | 4 | Game 2 — Voxel Sandbox (Minecraft) | DONE | Terrain is generated from the seed on both sides; only mutations cross the wire |
 | 5 | Game 3 — Car Race | DONE | Track geometry lives in `shared/track.js` so the road you see is the road you may drive on |
 | 6 | Game 4 — Mango Target | DONE | |
-| 7 | Game 5 — Baking Kitchen | TODO | |
+| 7 | Game 5 — Baking Kitchen | DONE | `client/js/lib/crew.js` added here and reused by every walking game |
 | 8 | Game 6 — Ice Cream Inc. | TODO | |
 | 9 | Game 7 — Train Race | TODO | |
 | 10 | Game 8 — Baby Cleaning | TODO | |

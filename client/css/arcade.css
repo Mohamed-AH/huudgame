@@ -461,6 +461,22 @@ input[type="text"]:focus { border-color: var(--amber); }
 .meter { width: min(20rem, 80vw); height: 0.7rem; border-radius: 0.4rem; background: rgba(0, 0, 0, 0.6); border: 1px solid var(--line); overflow: hidden; }
 .meter > i { display: block; height: 100%; background: linear-gradient(90deg, var(--good), var(--gold)); transition: width 0.12s linear; }
 
+/* The kitchen's ticket rail, and anything else that needs a row of small cards. */
+.rail { display: flex; gap: 0.35rem; flex-wrap: wrap; justify-content: center; max-width: 100%; }
+.ticket {
+    position: relative;
+    background: rgba(0, 0, 0, 0.72);
+    border: 1px solid var(--line);
+    border-radius: 0.5rem;
+    padding: 0.3rem 0.5rem 0.45rem;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.ticket .fuse { position: absolute; left: 0; bottom: 0; height: 3px; background: var(--good); transition: width 0.3s linear; }
+
 /* A pointer-capable device with a keyboard does not need thumb controls. */
 @media (hover: hover) and (pointer: fine) {
     .touch-controls { display: none; }
