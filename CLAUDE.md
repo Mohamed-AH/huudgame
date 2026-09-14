@@ -155,7 +155,7 @@ Status values: `TODO` / `WIP` / `DONE`.
 | 3 | Game 1 — Guess a Number | DONE | |
 | 4 | Game 2 — Voxel Sandbox (Minecraft) | DONE | Terrain is generated from the seed on both sides; only mutations cross the wire |
 | 5 | Game 3 — Car Race | DONE | Track geometry lives in `shared/track.js` so the road you see is the road you may drive on |
-| 6 | Game 4 — Mango Target | TODO | |
+| 6 | Game 4 — Mango Target | DONE | |
 | 7 | Game 5 — Baking Kitchen | TODO | |
 | 8 | Game 6 — Ice Cream Inc. | TODO | |
 | 9 | Game 7 — Train Race | TODO | |
@@ -189,3 +189,19 @@ Status values: `TODO` / `WIP` / `DONE`.
 5. **Look at `.shots/<id>.png`.** Every game so far has needed camera framing fixed
    after seeing the first real frame; the tests pass long before the shot looks right.
 6. Mark the phase DONE in §5 and commit.
+
+### Framing lessons already paid for (do not relearn these)
+
+- **Aim the camera at the near ground, not at the scenery.** Pointing the look axis
+  at the interesting thing in the distance flattens the pitch and pushes the players
+  off the bottom of the frame. Look at a point a few units in front of the near edge
+  of the action instead.
+- **Space 14 entities at least 1.9 units apart.** Any arc tight enough to frame
+  nicely puts a full room shoulder to shoulder, and adjacent floor pads merge into a
+  single dark band.
+- **Always add `build.skyDome()`.** A scene without one is half flat black.
+- **Build all 14 seats/podiums/pads, occupied or not.** A family of four should see a
+  game show with room to spare, not an empty ring.
+- **No nameplate over your own head** - in third person it sits on the lens.
+- **Only send what moves.** Fixed scenery goes in `fullState()`; state changes to it
+  are events. Per-tick snapshots carry moving things and nothing else.
