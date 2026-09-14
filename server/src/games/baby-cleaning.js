@@ -63,8 +63,6 @@ export function create(room) {
     }));
 
     const kids = new Map();
-    let binnedRight = 0;
-    let binnedWrong = 0;
 
     function kidOf(player) {
         let k = kids.get(player.id);
@@ -122,8 +120,8 @@ export function create(room) {
                 toy.by = null;
                 k.carrying = null;
                 const right = bin.cat === toy.cat;
-                if (right) { binnedRight++; player.score += 15; k.tidied++; }
-                else { binnedWrong++; player.score += 2; }
+                if (right) { player.score += 15; k.tidied++; }
+                else { player.score += 2; }
                 room.emit('bin', { id: toy.id, by: player.id, cat: bin.cat, ok: right ? 1 : 0, pct: tidiness() });
                 return;
             }

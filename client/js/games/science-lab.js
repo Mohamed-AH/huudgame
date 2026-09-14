@@ -11,7 +11,7 @@ export const meta = { id: 'science-lab' };
 const BENCH_RADIUS = 9.5;
 
 export function create(ctx) {
-    const { THREE, scene, camera, build, hud, net, input, particles, sound, interp } = ctx;
+    const { THREE, scene, camera, build, hud, net, input, particles, sound } = ctx;
 
     const benches = new Map();
     let elements = [];

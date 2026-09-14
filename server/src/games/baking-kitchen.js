@@ -207,6 +207,8 @@ export function create(room) {
             return {
                 tl: r2(room.timeLeft()),
                 fam: family,
+                done: completed,
+                lost: spoiled + burned,
                 p: [...room.players.values()].map((p) => {
                     const c = cookOf(p);
                     return [p.slot, r2(c.x), r2(c.z), r2(c.rot), c.carrying ? c.carrying.step + 1 : 0, c.carrying?.burnt ? 1 : 0];

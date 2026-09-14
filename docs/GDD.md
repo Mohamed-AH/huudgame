@@ -1,7 +1,9 @@
 # HUUD Family Arcade — Game Design Document
 
 Phase 1 deliverable for `masterplan.md`. This document is the contract the code in
-`server/src/games/` and `client/js/games/` implements. Sections 1–6 are the shared
+`server/src/games/` and `client/js/games/` implements, and it is kept in step with
+what actually shipped - where a number here disagreed with the code, the number here
+was the one that was wrong and has been corrected. Sections 1–6 are the shared
 framework; section 7 covers each of the 13 games.
 
 ---
@@ -169,12 +171,13 @@ text, round state machine. **Controls:** on-screen keypad (all devices), physica
 digits + Enter on PC.
 
 ### 7.2 Voxel Sandbox — `voxel-sandbox` · coop
-A 32×16×32 bounded blocky world rendered as one `InstancedMesh` per block type — a
-whole world in 6 draw calls. 14 players mine and place from a 6-block palette. A
+A 28×12×28 bounded blocky world rendered as a single `InstancedMesh` with per-instance
+colour — the whole island in one draw call. 14 players mine and place from a 6-block palette. A
 build target (a silhouette shown on a board) gives the family a goal; matching voxels
 light up. **Score:** shared completion percentage of the target, plus a personal
 "blocks placed correctly" tally. **Server owns:** the voxel grid, reach validation
-(4 blocks), grid mutations, player positions. **Controls:** joystick + tap to mine /
+(6 blocks), grid mutations, player positions. The terrain itself never crosses the
+wire: both sides generate it from the round seed. **Controls:** joystick + tap to mine /
 long-press to place; WASD + Space + left/right click on PC.
 
 ### 7.3 Car Race — `car-race` · ffa
@@ -218,7 +221,7 @@ collision, finish order. **Controls:** throttle slider + lane buttons; up/down +
 left/right on PC.
 
 ### 7.8 Baby Cleaning — `baby-cleaning` · coop
-A nursery with 60 scattered toys in 4 categories and 12 floor stains. Carry toys to
+A nursery with 56 scattered toys in 4 categories and 12 floor stains. Carry toys to
 the matching bin; stand on a stain and hold to scrub. Sorting into the *wrong* bin
 still clears the floor but scores nothing, which keeps small children in the game.
 **Score:** family tidiness percentage against a 120s clock. **Server owns:** toy
@@ -226,8 +229,8 @@ positions and carry state, bin contents, per-stain scrub progress. **Controls:**
 joystick + action button; WASD + E on PC.
 
 ### 7.9 Bus Cleaning — `bus-cleaning` · coop
-A giant double-decker covered in a 24×10 dirt grid, rendered as an `InstancedMesh`
-of grime tiles that pop away as they are cleaned. Players aim a pressure washer;
+A giant double-decker covered in a 22×6 grime grid on each of three faces — 396 cells
+in one `InstancedMesh`, each tile shrinking and fading as it is washed. Players aim a pressure washer;
 the server clears grid cells within the spray cone. Interior trash spawns too.
 **Score:** shared clean percentage; per-player cells cleared. **Server owns:** the
 dirt grid, spray cone resolution, trash pickup. **Controls:** joystick to move +
@@ -244,7 +247,8 @@ steering; WASD on PC.
 A spotlit turntable reveals a low-poly animal in stages: silhouette → outline →
 partial color → full. Four choices appear; guessing early is worth more. 14 seat pods
 around the stage light up as their occupants lock in. **Score:** 100 at stage 1
-falling to 25 at stage 4; a speed bonus for the first correct answer. 8 rounds.
+falling to 25 at stage 4; a speed bonus for the first correct answer. 8 rounds. The client is sent the animal's *shape* and four names, never the mapping
+between them — the table lives only on the server.
 **Server owns:** the animal sequence (seeded), reveal state machine, answer
 evaluation, scoring. **Controls:** tap a choice; keys 1–4 on PC.
 
@@ -257,8 +261,8 @@ display. **Score:** correct combinations, with a bonus for the rarer recipes.
 events, scoring. **Controls:** drag-and-drop (touch and mouse identical).
 
 ### 7.13 Barber Game — `barber-shop` · ffa
-Each player gets a cartoon head whose hair is 260 instanced strands with per-strand
-length. A target style card shows the goal profile. Clippers shorten strands, spray
+Each player gets a cartoon head whose hair is 108 instanced strands with per-strand
+length and colour. A target style card shows the goal profile. Clippers shorten strands, spray
 grows them, dye recolors them. At time-up every head is scored against the target and
 paraded on a turntable. **Score:** match accuracy percentage. **Server owns:** the
 strand length/color arrays, tool application, the accuracy algorithm, the showcase
@@ -270,8 +274,9 @@ order. **Controls:** drag to trim/grow/paint with a tool selector; mouse drag on
 
 Every arena is sized so that 14 entities are visible and distinguishable at once:
 
-- Movement games use a **34×34** unit play field with spawn points on a ring of
-  radius 13 — far enough apart that nobody spawns inside anyone.
+- Movement games use a play field of roughly **30×20** to **40×40** units with spawn
+  points spread on a ring or a line, at least 1.9 units apart — any tighter and a full
+  room stands shoulder to shoulder and the floor markers merge into one dark band.
 - Station games (kitchen, lab, barber) use a **per-player workstation** on an arc,
   with the camera framed on your own station and the others visible in the background.
 - Stage games (guess a number, guess animal) use a **ring of 14 pods** at radius 11

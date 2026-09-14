@@ -146,7 +146,7 @@ export function create(ctx) {
         onState(s) {
             family = s.fam ?? family;
             buffer.push(s.p);
-            hud.setObjective(`Family score ${family}`);
+            hud.setObjective(`Family score ${family}  ·  ${s.done ?? 0} served, ${s.lost ?? 0} lost`);
             renderOrders(s.o ?? []);
 
             for (const [id, hasItem, progress, ready, burnt] of s.s ?? []) {

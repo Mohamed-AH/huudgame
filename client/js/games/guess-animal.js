@@ -12,7 +12,7 @@ const RING_RADIUS = 11;
 const SILHOUETTE = 0x05060a;
 
 export function create(ctx) {
-    const { THREE, scene, camera, build, hud, net, particles, sound, input, interp } = ctx;
+    const { THREE, scene, camera, build, hud, net, particles, sound, input } = ctx;
 
     const pods = new Map();
     let turntable = null;

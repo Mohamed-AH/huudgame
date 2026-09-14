@@ -23,8 +23,6 @@ export function create(ctx) {
     let flavors = [];
     let toppings = [];
     let holding = false;
-    let pickedFlavor = 0;
-    let pickedTopping = 0;
 
     const SWIRL_GEO = new THREE.CylinderGeometry(0.16, 0.42, 1, 10);
 
@@ -109,7 +107,6 @@ export function create(ctx) {
     }
 
     function pickFlavor(i) {
-        pickedFlavor = i;
         net.action({ a: 'flavor', f: i });
         for (const btn of hud.panel.querySelectorAll('[data-flavor]')) {
             btn.setAttribute('aria-pressed', String(Number(btn.dataset.flavor) === i));
@@ -118,7 +115,6 @@ export function create(ctx) {
     }
 
     function pickTopping(i) {
-        pickedTopping = i;
         net.action({ a: 'top', tp: i });
         for (const btn of hud.panel.querySelectorAll('[data-top]')) {
             btn.setAttribute('aria-pressed', String(Number(btn.dataset.top) === i));

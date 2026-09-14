@@ -45,7 +45,6 @@ export function create(room) {
 
     const crew = new Map();
     let changes = [];
-    let cleanedCells = 0;
 
     function washerOf(player) {
         let w = crew.get(player.id);
@@ -106,7 +105,6 @@ export function create(room) {
                 const removed = before - grime[index];
                 w.cleaned += removed;
                 player.score += removed * 14;
-                if (before > 0 && grime[index] === 0) cleanedCells++;
             }
         }
     }
