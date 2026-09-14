@@ -160,7 +160,7 @@ Status values: `TODO` / `WIP` / `DONE`.
 | 5 | Game 3 — Car Race | DONE | Track geometry lives in `shared/track.js` so the road you see is the road you may drive on |
 | 6 | Game 4 — Mango Target | DONE | |
 | 7 | Game 5 — Baking Kitchen | DONE | `client/js/lib/crew.js` added here and reused by every walking game |
-| 8 | Game 6 — Ice Cream Inc. | TODO | |
+| 8 | Game 6 — Ice Cream Inc. | DONE | Found the reserved-wire-key bug; see docs/PROTOCOL.md |
 | 9 | Game 7 — Train Race | TODO | |
 | 10 | Game 8 — Baby Cleaning | TODO | |
 | 11 | Game 9 — Bus Cleaning | TODO | |
@@ -179,6 +179,9 @@ Status values: `TODO` / `WIP` / `DONE`.
 - 4-space indent in `.js`, single quotes, semicolons.
 - Game ids are kebab-case and identical on both sides (`guess-number`, `mango-target`).
 - Keep per-tick payloads small: short keys, numbers rounded to 2 decimals.
+- **`t` and `n` are reserved wire keys.** Never name a game payload field `t` (message
+  type) or `n` (action sequence). Doing so used to rewrite the message type silently;
+  `net.js` now sets them last so it cannot, but the field is still lost.
 - Comments explain *why*, not *what*. Match the density of surrounding code.
 
 ### Per-game checklist (follow this for every game)
@@ -203,6 +206,9 @@ Status values: `TODO` / `WIP` / `DONE`.
   nicely puts a full room shoulder to shoulder, and adjacent floor pads merge into a
   single dark band.
 - **Always add `build.skyDome()`.** A scene without one is half flat black.
+- **Tint the rig per game** with `ctx.engine.setLighting({hemi, sun, sky, ground})`.
+  A pastel parlour and a night race cannot share one exposure; `clearRoot()` restores
+  the defaults so a game never has to undo it.
 - **Build all 14 seats/podiums/pads, occupied or not.** A family of four should see a
   game show with room to spare, not an empty ring.
 - **No nameplate over your own head** - in third person it sits on the lens.

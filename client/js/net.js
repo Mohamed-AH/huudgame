@@ -151,13 +151,16 @@ export class Net {
         const now = performance.now();
         if (now - this._lastInputAt < 1000 / INPUT_HZ) return;
         this._lastInputAt = now;
-        this.send({ t: C2S.INPUT, ...this._pendingInput });
+        // `t` and `n` are spread LAST on purpose. They are the protocol's reserved
+        // keys, and a game payload that happens to use one of them must not be able
+        // to overwrite the message type - that failure is silent and baffling.
+        this.send({ ...this._pendingInput, t: C2S.INPUT });
         this._pendingInput = null;
     }
 
     /** Discrete intent. Sequenced, so a frame replayed after a reconnect is ignored. */
     action(payload) {
-        this.send({ t: C2S.ACTION, n: ++this._seq, ...payload });
+        this.send({ ...payload, t: C2S.ACTION, n: ++this._seq });
     }
 
     // ------------------------------------------------------------ room commands

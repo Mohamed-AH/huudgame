@@ -89,6 +89,13 @@ const ACTIONS = {
     'guess-number': () => ({ a: 'guess', v: Math.ceil(rand(1, 100)) }),
     'mango-target': () => ({ a: 'throw', yaw: rand(-1, 1), pitch: rand(0.2, 1.1), pow: rand(0.3, 1) }),
     'baking-kitchen': () => ({ a: 'use' }),
+    'ice-cream': () => {
+        const roll = Math.random();
+        if (roll < 0.2) return { a: 'flavor', f: Math.floor(rand(0, 4)) };
+        if (roll < 0.4) return { a: 'top', tp: Math.floor(rand(0, 4)) };
+        if (roll < 0.6) return { a: 'serve' };
+        return null;
+    },
     'voxel-sandbox': () => (Math.random() < 0.5
         ? { a: 'mine', x: Math.floor(rand(0, 28)), y: Math.floor(rand(1, 8)), z: Math.floor(rand(0, 28)) }
         : { a: 'place', x: Math.floor(rand(0, 28)), y: Math.floor(rand(1, 8)), z: Math.floor(rand(0, 28)), b: Math.ceil(rand(1, 6)) }),
@@ -193,7 +200,7 @@ try {
         const flail = setInterval(() => {
             for (const [i, b] of bots.entries()) {
                 const p = Date.now() / 700 + i;
-                b.send({ t: C2S.INPUT, ax: Math.cos(p), ay: Math.sin(p), b: i % 2 });
+                b.send({ t: C2S.INPUT, ax: Math.cos(p), ay: Math.sin(p), b: i % 2, h: Math.sin(p * 3) > 0 ? 1 : 0 });
                 const action = act?.(i);
                 if (action) b.send({ t: C2S.ACTION, n: ++b.seq, ...action });
             }

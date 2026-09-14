@@ -51,8 +51,12 @@ const child = spawn(process.execPath, [join(ROOT, 'server/src/index.js')], {
     stdio: ['ignore', 'pipe', 'pipe'],
 });
 const serverLog = [];
-child.stdout.on('data', (d) => serverLog.push(String(d)));
-child.stderr.on('data', (d) => serverLog.push(String(d)));
+const tee = (d) => {
+    serverLog.push(String(d));
+    if (process.env.DEBUG_SERVER === '1') process.stderr.write(String(d));
+};
+child.stdout.on('data', tee);
+child.stderr.on('data', tee);
 
 async function waitForServer() {
     for (let i = 0; i < 120; i++) {

@@ -34,6 +34,7 @@ export class Engine {
         this.sun = new THREE.DirectionalLight(0xfff3d6, 0.55);
         this.sun.position.set(8, 18, 6);
         this.scene.add(this.hemi, this.sun);
+        this._defaultLight = { hemi: 0.85, sun: 0.55, sky: 0xdfe7ff, ground: 0x2a2418 };
 
         /** Everything a game builds lives here and nowhere else. */
         this.root = new THREE.Group();
@@ -110,8 +111,25 @@ export class Engine {
      * Empties `root` and releases every GPU resource under it. Without this, thirteen
      * games in one sitting is thirteen scene graphs' worth of leaked VRAM.
      */
+    /**
+     * Games may brighten or tint the shared rig - a pastel ice cream parlour and a
+     * night race cannot share one exposure. `clearRoot` puts it back, so a game never
+     * has to remember to undo it.
+     */
+    setLighting({ hemi, sun, sky, ground } = {}) {
+        if (hemi !== undefined) this.hemi.intensity = hemi;
+        if (sun !== undefined) this.sun.intensity = sun;
+        if (sky !== undefined) this.hemi.color.setHex(sky);
+        if (ground !== undefined) this.hemi.groundColor.setHex(ground);
+    }
+
     clearRoot() {
         disposeChildren(this.root);
+        const d = this._defaultLight;
+        this.hemi.intensity = d.hemi;
+        this.sun.intensity = d.sun;
+        this.hemi.color.setHex(d.sky);
+        this.hemi.groundColor.setHex(d.ground);
         this.scene.fog.near = 42;
         this.scene.fog.far = 90;
         this.scene.background = null;

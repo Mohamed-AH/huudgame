@@ -457,6 +457,8 @@ input[type="text"]:focus { border-color: var(--amber); }
 .tool-row { display: flex; gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
 .tool-row button { font: inherit; font-weight: 700; font-size: 0.82rem; padding: 0.5rem 0.8rem; border-radius: 0.7rem; border: 2px solid var(--line); background: rgba(0, 0, 0, 0.62); color: var(--cream); cursor: pointer; display: flex; align-items: center; gap: 0.3rem; }
 .tool-row button[aria-pressed="true"] { background: rgba(245, 158, 11, 0.3); border-color: var(--amber); }
+.hold-btn { min-width: 9rem; padding: 0.8rem 1rem !important; font-size: 0.95rem !important; }
+.hold-btn[aria-pressed="true"] { background: rgba(6, 214, 160, 0.35) !important; border-color: var(--good) !important; }
 
 .meter { width: min(20rem, 80vw); height: 0.7rem; border-radius: 0.4rem; background: rgba(0, 0, 0, 0.6); border: 1px solid var(--line); overflow: hidden; }
 .meter > i { display: block; height: 100%; background: linear-gradient(90deg, var(--good), var(--gold)); transition: width 0.12s linear; }

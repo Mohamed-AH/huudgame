@@ -73,6 +73,12 @@ server ──▶  { t:'event',  e:'hit', by:'p_7f3a', v:50 }     one-shot
 server ──▶  { t:'scores', b:[ {i:'p_7f3a', s:340}, ... ] }  2Hz
 ```
 
+**`t` and `n` are reserved.** A game payload must never use either as a field name -
+`t` is the message-type discriminator and `n` is the action sequence number. The
+client's `net.input()` and `net.action()` spread the payload first and set `t`/`n`
+last so a collision cannot silently rewrite the message type, but a game that names a
+field `t` will still lose that field. Name it something else.
+
 `n` on an action is a per-client sequence number. The server keeps the last seen `n`
 per player and drops anything not greater, which makes a replayed frame after a
 reconnect harmless.
