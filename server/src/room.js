@@ -302,8 +302,11 @@ export class Room {
         if (!this.game) return;
 
         let results = [];
+        let familyScore = null;
         try {
             results = this.game.results?.() ?? [];
+            // Co-op games score the family as a whole; the podium is the sideshow.
+            familyScore = this.game.familyScore?.() ?? null;
         } catch (err) {
             console.error(`[room ${this.code}] results threw:`, err);
         }
@@ -318,7 +321,7 @@ export class Room {
 
         this.phase = PHASE.RESULTS;
         this.broadcastScores();
-        this.broadcast({ t: S2C.END, reason, results });
+        this.broadcast({ t: S2C.END, reason, results, familyScore });
         this.broadcastRoom();
 
         this._phaseTimeout = setTimeout(() => this.toLobby(), LIMITS.RESULTS_MS);

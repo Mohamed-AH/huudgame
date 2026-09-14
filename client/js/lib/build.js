@@ -215,7 +215,9 @@ export function nameplate(name, slot, { scale = 1 } = {}) {
     tex.colorSpace = THREE.SRGBColorSpace;
     const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
     const aspect = canvas.width / canvas.height;
-    sprite.scale.set(0.42 * aspect * scale, 0.42 * scale, 1);
+    // Small on purpose: a nameplate sitting a couple of metres from the camera in a
+    // third-person game will otherwise cover half the screen.
+    sprite.scale.set(0.3 * aspect * scale, 0.3 * scale, 1);
     sprite.renderOrder = 10;
     return sprite;
 }

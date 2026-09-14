@@ -153,7 +153,7 @@ Status values: `TODO` / `WIP` / `DONE`.
 | 1 | Server core: rooms, 14 slots, phase machine, tick loop, static serving | DONE | `tools/smoke.js` added alongside |
 | 2 | Client core: engine, net, input, HUD, lobby, game loader | DONE | `tools/browser.js` added alongside |
 | 3 | Game 1 — Guess a Number | DONE | |
-| 4 | Game 2 — Voxel Sandbox (Minecraft) | TODO | |
+| 4 | Game 2 — Voxel Sandbox (Minecraft) | DONE | Terrain is generated from the seed on both sides; only mutations cross the wire |
 | 5 | Game 3 — Car Race | TODO | |
 | 6 | Game 4 — Mango Target | TODO | |
 | 7 | Game 5 — Baking Kitchen | TODO | |
