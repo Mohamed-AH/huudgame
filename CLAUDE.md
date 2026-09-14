@@ -165,7 +165,7 @@ Status values: `TODO` / `WIP` / `DONE`.
 | 10 | Game 8 — Baby Cleaning | DONE | |
 | 11 | Game 9 — Bus Cleaning | DONE | Ray/box cast lives in `shared/bus.js`; the reticle and the scrub use the same maths |
 | 12 | Game 10 — Collecting Car Coins | DONE | |
-| 13 | Game 11 — Guess Animal | TODO | |
+| 13 | Game 11 — Guess Animal | DONE | Animal table is server-only on purpose; the client gets a shape, never a name |
 | 14 | Game 12 — Science Game | TODO | |
 | 15 | Game 13 — Barber Game | TODO | |
 | 16 | Integration: link the Arcade from `huud-website.html`, README, final polish | TODO | |
