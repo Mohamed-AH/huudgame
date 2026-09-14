@@ -1,0 +1,463 @@
+/* HUUD Family Arcade — hand-written CSS, no framework.
+   Shares the site's gold-on-night palette so the arcade feels like the same place. */
+
+:root {
+    --night:  #0b0c10;
+    --deep:   #131722;
+    --panel:  rgba(19, 23, 34, 0.92);
+    --line:   rgba(245, 158, 11, 0.28);
+    --gold:   #ffb703;
+    --amber:  #f59e0b;
+    --cream:  #f3f4f6;
+    --muted:  #9aa3b2;
+    --good:   #06d6a0;
+    --warn:   #ffd166;
+    --bad:    #ef476f;
+    --safe-b: env(safe-area-inset-bottom, 0px);
+    --safe-t: env(safe-area-inset-top, 0px);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: var(--night);
+    color: var(--cream);
+    font-family: 'Outfit', system-ui, sans-serif;
+    overscroll-behavior: none;
+}
+
+/* The canvas must never scroll, zoom, or bounce under a thumb. */
+#stage {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: none;
+    background: radial-gradient(circle at 50% 35%, #1b2030 0%, var(--night) 70%);
+}
+
+.logo {
+    font-family: 'Luckiest Guy', cursive;
+    font-size: clamp(2.2rem, 9vw, 3.4rem);
+    letter-spacing: 2px;
+    margin: 0;
+    line-height: 1;
+    background: linear-gradient(135deg, #fff5c0 0%, #fbbf24 35%, #d97706 70%, #fffbeb 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.logo span { display: block; font-size: 0.55em; letter-spacing: 8px; }
+
+.tagline { color: var(--muted); margin: 0.25rem 0 1.5rem; font-size: 0.95rem; }
+
+/* ───────────────────────────── screens ───────────────────────────── */
+
+.screen {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: calc(1rem + var(--safe-t)) 1rem calc(1rem + var(--safe-b));
+    overflow-y: auto;
+    background: radial-gradient(circle at 50% 20%, rgba(245, 158, 11, 0.08), transparent 60%), rgba(11, 12, 16, 0.72);
+    backdrop-filter: blur(6px);
+}
+.screen[hidden] { display: none; }
+.screen-overlay { background: rgba(11, 12, 16, 0.94); }
+
+.panel {
+    width: 100%;
+    max-width: 26rem;
+    background: var(--panel);
+    border: 2px solid var(--line);
+    border-radius: 1.4rem;
+    padding: 1.75rem;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+.panel-wide { max-width: 40rem; }
+
+.field { display: block; text-align: left; margin-bottom: 1rem; }
+.field > span { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.35rem; letter-spacing: 0.04em; text-transform: uppercase; }
+
+input[type="text"] {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    font: inherit;
+    font-size: 1.05rem;
+    color: var(--cream);
+    background: rgba(0, 0, 0, 0.45);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.8rem;
+    outline: none;
+}
+input[type="text"]:focus { border-color: var(--amber); }
+#code-input { text-transform: uppercase; letter-spacing: 0.4em; text-align: center; font-family: 'Luckiest Guy', cursive; font-size: 1.4rem; }
+
+.btn {
+    font: inherit;
+    font-weight: 700;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.9rem;
+    border: 2px solid var(--line);
+    background: rgba(245, 158, 11, 0.12);
+    color: var(--gold);
+    cursor: pointer;
+    transition: transform 0.12s ease, background 0.2s ease, border-color 0.2s ease;
+    touch-action: manipulation;
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.btn-primary { background: linear-gradient(135deg, #fbbf24, #d97706); color: #1a1205; border-color: transparent; width: 100%; }
+.btn-lg { font-size: 1.15rem; padding: 0.9rem 2rem; }
+.btn-sm { padding: 0.4rem 0.7rem; font-size: 0.78rem; border-radius: 0.6rem; }
+.btn-ghost { background: transparent; color: var(--muted); border-color: rgba(255, 255, 255, 0.14); }
+@media (hover: hover) {
+    .btn:hover:not(:disabled) { background: rgba(245, 158, 11, 0.22); }
+    .btn-primary:hover:not(:disabled) { background: linear-gradient(135deg, #fef08a, #f59e0b); }
+}
+
+.or { position: relative; margin: 1.25rem 0; color: var(--muted); font-size: 0.8rem; }
+.or::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(255, 255, 255, 0.1); }
+.or span { position: relative; background: var(--panel); padding: 0 0.75rem; }
+
+.join-row { display: flex; gap: 0.6rem; }
+.join-row input { flex: 1; }
+
+.status { min-height: 1.4rem; margin: 1rem 0 0; font-size: 0.86rem; color: var(--muted); }
+.status.error { color: var(--bad); }
+
+/* ───────────────────────────── lobby ───────────────────────────── */
+
+.lobby-wrap {
+    width: 100%;
+    max-width: 62rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 100%;
+}
+
+.lobby-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.room-code { display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; }
+.room-code .label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
+.room-code strong { font-family: 'Luckiest Guy', cursive; font-size: 2rem; letter-spacing: 0.25em; color: var(--gold); }
+
+.lobby-grid { display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); gap: 1rem; min-height: 0; flex: 1; }
+.lobby-grid > section { background: var(--panel); border: 2px solid var(--line); border-radius: 1.2rem; padding: 1rem; min-height: 0; display: flex; flex-direction: column; }
+.lobby-grid h2 { margin: 0 0 0.75rem; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); display: flex; justify-content: space-between; }
+.hint { margin: 0 0 0.75rem; font-size: 0.82rem; color: var(--muted); }
+
+.roster { list-style: none; margin: 0; padding: 0; overflow-y: auto; display: grid; gap: 0.35rem; }
+.roster li { display: flex; align-items: center; gap: 0.55rem; padding: 0.4rem 0.55rem; border-radius: 0.6rem; background: rgba(0, 0, 0, 0.3); font-size: 0.9rem; }
+.roster li.empty { opacity: 0.32; }
+.roster li.you { outline: 2px solid var(--amber); }
+.roster .chip { width: 0.85rem; height: 0.85rem; border-radius: 50%; flex: 0 0 auto; }
+.roster .who { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.roster .tag { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gold); }
+
+.game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr)); gap: 0.6rem; overflow-y: auto; }
+.game-tile {
+    text-align: left;
+    padding: 0.7rem;
+    border-radius: 0.9rem;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.35);
+    color: var(--cream);
+    font: inherit;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.game-tile .emoji { font-size: 1.5rem; }
+.game-tile .name { font-weight: 700; font-size: 0.9rem; line-height: 1.15; }
+.game-tile .blurb { font-size: 0.72rem; color: var(--muted); line-height: 1.25; }
+.game-tile .mode { font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); }
+.game-tile[aria-pressed="true"] { border-color: var(--amber); background: rgba(245, 158, 11, 0.16); }
+.game-tile:disabled { cursor: default; opacity: 0.75; }
+
+.lobby-foot { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.chosen { font-size: 0.9rem; color: var(--muted); }
+.chosen strong { color: var(--gold); }
+.lobby-foot .btn-primary { width: auto; }
+
+@media (max-width: 40rem) {
+    .lobby-grid { grid-template-columns: 1fr; }
+    .roster-col { max-height: 34vh; }
+}
+
+/* ───────────────────────────── HUD ───────────────────────────── */
+
+.hud { position: fixed; inset: 0; z-index: 10; pointer-events: none; }
+.hud[hidden] { display: none; }
+.hud button, .hud input, .hud .interactive { pointer-events: auto; }
+
+.hud-top {
+    position: absolute;
+    top: calc(0.6rem + var(--safe-t));
+    left: 0.6rem;
+    right: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+.hud-chip {
+    font: inherit;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.6rem;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.hud-btn { cursor: pointer; color: var(--gold); }
+.hud-chip .dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--good); display: block; }
+.hud-chip .dot.warn { background: var(--warn); }
+.hud-chip .dot.bad { background: var(--bad); }
+.hud-timer {
+    margin-left: auto;
+    font-family: 'Luckiest Guy', cursive;
+    font-size: 1.5rem;
+    letter-spacing: 0.06em;
+    color: var(--gold);
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+}
+.hud-timer.urgent { color: var(--bad); animation: pulse 0.7s infinite; }
+@keyframes pulse { 50% { opacity: 0.45; } }
+
+.hud-banner {
+    position: absolute;
+    top: 22%;
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    font-family: 'Luckiest Guy', cursive;
+    font-size: clamp(1.4rem, 6vw, 2.6rem);
+    color: var(--gold);
+    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.9);
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    text-align: center;
+    width: 90%;
+    pointer-events: none;
+}
+.hud-banner.show { opacity: 1; transform: translateX(-50%) scale(1); }
+
+.hud-objective {
+    position: absolute;
+    top: calc(3.2rem + var(--safe-t));
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--cream);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0.3rem 0.8rem;
+    border-radius: 0.6rem;
+    text-align: center;
+    max-width: 88%;
+}
+.hud-objective:empty { display: none; }
+
+.hud-toasts {
+    position: absolute;
+    bottom: calc(9rem + var(--safe-b));
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    width: 90%;
+}
+.toast {
+    font-size: 0.84rem;
+    font-weight: 700;
+    padding: 0.3rem 0.75rem;
+    border-radius: 0.6rem;
+    background: rgba(0, 0, 0, 0.7);
+    border-left: 3px solid var(--gold);
+    animation: toastIn 0.2s ease, toastOut 0.3s ease 1.3s forwards;
+    white-space: nowrap;
+}
+@keyframes toastIn { from { opacity: 0; transform: translateY(8px); } }
+@keyframes toastOut { to { opacity: 0; transform: translateY(-8px); } }
+
+.hud-panel {
+    position: absolute;
+    bottom: calc(0.8rem + var(--safe-b));
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    pointer-events: auto;
+    max-width: min(92vw, 30rem);
+}
+.hud-panel:empty { display: none; }
+
+.scorepad {
+    position: absolute;
+    top: calc(3rem + var(--safe-t));
+    right: 0.6rem;
+    width: 13rem;
+    max-height: 62vh;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.78);
+    border: 1px solid var(--line);
+    border-radius: 0.8rem;
+    padding: 0.6rem;
+    pointer-events: auto;
+}
+.scorepad[hidden] { display: none; }
+.scorepad h3 { margin: 0 0 0.4rem; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+.scorepad ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.2rem; }
+.scorepad li { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; }
+.scorepad li.you { color: var(--gold); font-weight: 700; }
+.scorepad li.gone { opacity: 0.4; }
+.scorepad .chip { width: 0.7rem; height: 0.7rem; border-radius: 50%; flex: 0 0 auto; }
+.scorepad .who { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.scorepad .pts { font-variant-numeric: tabular-nums; }
+
+/* ───────────────────────────── touch controls ───────────────────────────── */
+
+.touch-controls { position: absolute; inset: 0; pointer-events: none; }
+.touch-controls[hidden] { display: none; }
+
+.stick {
+    position: absolute;
+    left: 1.2rem;
+    bottom: calc(1.6rem + var(--safe-b));
+    width: 7.5rem;
+    height: 7.5rem;
+    border-radius: 50%;
+    border: 2px solid rgba(245, 158, 11, 0.3);
+    background: rgba(0, 0, 0, 0.3);
+    pointer-events: auto;
+    touch-action: none;
+    opacity: 0.75;
+}
+.stick-knob {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 3rem;
+    height: 3rem;
+    margin: -1.5rem 0 0 -1.5rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fde68a, #d97706);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+    display: block;
+}
+
+.action-buttons {
+    position: absolute;
+    right: 1.2rem;
+    bottom: calc(1.6rem + var(--safe-b));
+    display: flex;
+    align-items: flex-end;
+    gap: 0.7rem;
+    pointer-events: none;
+}
+.abtn {
+    pointer-events: auto;
+    touch-action: none;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.18);
+    font-family: 'Luckiest Guy', cursive;
+    color: #1a1205;
+    opacity: 0.9;
+}
+.abtn-a { width: 5.2rem; height: 5.2rem; font-size: 1.5rem; background: radial-gradient(circle at 35% 30%, #fde68a, #d97706); }
+.abtn-b { width: 3.8rem; height: 3.8rem; font-size: 1.1rem; background: radial-gradient(circle at 35% 30%, #cbd5e1, #64748b); color: #0b0c10; }
+.abtn:active { transform: scale(0.94); }
+.abtn[hidden] { display: none; }
+
+.countdown {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(11, 12, 16, 0.55);
+}
+.countdown[hidden] { display: none; }
+.countdown span {
+    font-family: 'Luckiest Guy', cursive;
+    font-size: clamp(4rem, 24vw, 10rem);
+    color: var(--gold);
+    text-shadow: 0 8px 40px rgba(0, 0, 0, 0.9);
+    animation: pop 0.5s ease;
+}
+@keyframes pop { from { transform: scale(1.6); opacity: 0; } }
+
+/* ───────────────────────────── results ───────────────────────────── */
+
+.results-title { font-family: 'Luckiest Guy', cursive; font-size: 2rem; margin: 0 0 1rem; color: var(--gold); }
+
+.podium { list-style: none; margin: 0 0 1.25rem; padding: 0; display: flex; align-items: flex-end; justify-content: center; gap: 0.6rem; }
+.podium li { flex: 1; max-width: 8rem; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; }
+.podium .block { width: 100%; border-radius: 0.6rem 0.6rem 0 0; background: linear-gradient(180deg, rgba(245, 158, 11, 0.55), rgba(245, 158, 11, 0.12)); display: flex; align-items: flex-start; justify-content: center; padding-top: 0.4rem; font-family: 'Luckiest Guy', cursive; font-size: 1.4rem; }
+.podium .p1 .block { height: 6.5rem; }
+.podium .p2 .block { height: 4.8rem; }
+.podium .p3 .block { height: 3.6rem; }
+.podium .who { font-weight: 700; font-size: 0.9rem; text-align: center; }
+.podium .pts { font-size: 0.8rem; color: var(--muted); }
+
+.results-list { list-style: none; margin: 0 0 1.25rem; padding: 0; max-height: 30vh; overflow-y: auto; display: grid; gap: 0.25rem; text-align: left; }
+.results-list li { display: flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0.5rem; border-radius: 0.5rem; background: rgba(0, 0, 0, 0.3); font-size: 0.86rem; }
+.results-list .place { width: 1.6rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.results-list .who { flex: 1; }
+.results-list .pts { font-weight: 700; color: var(--gold); font-variant-numeric: tabular-nums; }
+.results-list li.you { outline: 1px solid var(--amber); }
+
+.results-actions { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+.results-actions .btn-primary { width: auto; }
+
+/* ───────────────────────────── veil ───────────────────────────── */
+
+.veil { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; background: rgba(11, 12, 16, 0.72); backdrop-filter: blur(3px); }
+.veil[hidden] { display: none; }
+.veil-inner { text-align: center; }
+.spinner { width: 2.6rem; height: 2.6rem; margin: 0 auto 0.8rem; border: 3px solid rgba(245, 158, 11, 0.25); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ───────────────────────────── game-supplied controls ───────────────────────────── */
+
+.keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; width: min(16rem, 70vw); }
+.keypad button { font-family: 'Luckiest Guy', cursive; font-size: 1.3rem; padding: 0.55rem 0; border-radius: 0.7rem; border: 2px solid var(--line); background: rgba(0, 0, 0, 0.6); color: var(--cream); cursor: pointer; }
+.keypad button:active { background: rgba(245, 158, 11, 0.3); }
+.keypad .wide { grid-column: span 2; }
+
+.readout { font-family: 'Luckiest Guy', cursive; font-size: 2rem; letter-spacing: 0.15em; color: var(--gold); background: rgba(0, 0, 0, 0.6); border-radius: 0.7rem; padding: 0.2rem 1.2rem; min-width: 5rem; text-align: center; }
+
+.choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; width: min(26rem, 90vw); }
+.choices button { font: inherit; font-weight: 700; font-size: 1rem; padding: 0.7rem 0.5rem; border-radius: 0.8rem; border: 2px solid var(--line); background: rgba(0, 0, 0, 0.62); color: var(--cream); cursor: pointer; }
+.choices button[aria-pressed="true"] { background: rgba(245, 158, 11, 0.3); border-color: var(--amber); }
+.choices button.right { background: rgba(6, 214, 160, 0.3); border-color: var(--good); }
+.choices button.wrong { background: rgba(239, 71, 111, 0.3); border-color: var(--bad); }
+
+.tool-row { display: flex; gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
+.tool-row button { font: inherit; font-weight: 700; font-size: 0.82rem; padding: 0.5rem 0.8rem; border-radius: 0.7rem; border: 2px solid var(--line); background: rgba(0, 0, 0, 0.62); color: var(--cream); cursor: pointer; display: flex; align-items: center; gap: 0.3rem; }
+.tool-row button[aria-pressed="true"] { background: rgba(245, 158, 11, 0.3); border-color: var(--amber); }
+
+.meter { width: min(20rem, 80vw); height: 0.7rem; border-radius: 0.4rem; background: rgba(0, 0, 0, 0.6); border: 1px solid var(--line); overflow: hidden; }
+.meter > i { display: block; height: 100%; background: linear-gradient(90deg, var(--good), var(--gold)); transition: width 0.12s linear; }
+
+/* A pointer-capable device with a keyboard does not need thumb controls. */
+@media (hover: hover) and (pointer: fine) {
+    .touch-controls { display: none; }
+}

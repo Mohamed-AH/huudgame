@@ -28,9 +28,10 @@ This build is long. A session may be interrupted at any point. To restart safely
 1. `git log --oneline -15` — every completed unit of work is its own commit.
 2. Read **§5 Phase tracker** below. The first phase not marked `DONE` is the next task.
 3. `npm install` (root) if `node_modules/` is missing.
-4. `npm run check` — `verify` (parse every file, registries agree) then `smoke`
-   (boots the real server, drives 4 bot clients through a full round of every
-   registered game). Both must pass before any commit.
+4. `npm run check` — `verify` (parse every file, registries agree), `smoke`
+   (real server, 4 bot sockets, a full round of every registered game), then
+   `browser` (real Chromium, three players, every game played on desktop and at
+   phone width). All three must pass before any commit.
 5. `npm start` then open `http://localhost:8080/play/` to sanity-check the lobby.
 6. Continue from the first non-`DONE` phase. Update §5 **in the same commit** that
    completes the work, so the tracker and the tree never disagree.
@@ -71,7 +72,9 @@ client/js/engine.js     Three.js renderer/scene/camera, DPR cap, resize, dispose
 client/js/input.js      Unified touch + pointer + keyboard; virtual joystick.
 client/js/hud.js        Scoreboard (14), timer, banners, toasts, connection state.
 client/js/lobby.js      Join screen, room code, roster, game picker, ready-up.
-client/js/lib/          Shared helpers: interpolation, pooling, geometry, audio.
+client/js/lib/build.js  Shared low-poly primitives, avatars, nameplates, arena floors.
+client/js/lib/interp.js SnapshotBuffer (renders 100ms in the past), damp, lerpAngle.
+client/js/lib/fx.js     Pooled InstancedMesh particles + synthesized sound.
 client/js/games/        One client module per game + registry.js.
 ```
 
@@ -90,7 +93,9 @@ export function create(room) {
     onInput(player, msg),       // continuous intent (movement axes, aim)
     onAction(player, msg),      // discrete intent (throw, place, guess)
     onJoin(player), onLeave(player),
-    snapshot(),                 // broadcast payload (small, per tick)
+    snapshot(),                 // broadcast payload (small, per tick).
+                                // MUST include `tl` (seconds left) - the HUD timer
+                                // on every client is driven by it and nothing else.
     fullState(player),          // one-shot payload on join / on start
     isOver(), results(),        // [{id, score, ...}] sorted desc
     dispose(),
@@ -130,7 +135,8 @@ export function create(ctx) {           // ctx = {THREE, scene, camera, renderer
 | `npm start` | Runs the arcade on `http://localhost:8080` (override with `PORT`). |
 | `npm run verify` | Syntax-parses every JS file and checks both game registries agree. |
 | `npm run smoke` | Boots the server on a scratch port and plays every registered game with bot clients. Pass game ids to narrow it: `node tools/smoke.js mango-target`. |
-| `npm run check` | `verify` then `smoke`. This is the pre-commit gate. |
+| `npm run browser` | Opens the arcade in real Chromium with three players, plays every built game, and checks for console errors, phone-width overflow, draw-call budget and GPU leaks. |
+| `npm run check` | `verify`, `smoke`, then `browser`. This is the pre-commit gate. |
 
 `three` is served by the server at `/vendor/three/` straight out of `node_modules`,
 so the client uses a bare `import ... from 'three'` via an importmap. No CDN.
@@ -145,7 +151,7 @@ Status values: `TODO` / `WIP` / `DONE`.
 |---|---|---|---|
 | 0 | Foundations: layout, `CLAUDE.md`, GDD, protocol doc, package.json, verify script | DONE | |
 | 1 | Server core: rooms, 14 slots, phase machine, tick loop, static serving | DONE | `tools/smoke.js` added alongside |
-| 2 | Client core: engine, net, input, HUD, lobby, game loader | TODO | |
+| 2 | Client core: engine, net, input, HUD, lobby, game loader | DONE | `tools/browser.js` added alongside |
 | 3 | Game 1 — Guess a Number | TODO | |
 | 4 | Game 2 — Voxel Sandbox (Minecraft) | TODO | |
 | 5 | Game 3 — Car Race | TODO | |
