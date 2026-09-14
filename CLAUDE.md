@@ -168,7 +168,19 @@ Status values: `TODO` / `WIP` / `DONE`.
 | 13 | Game 11 — Guess Animal | DONE | Animal table is server-only on purpose; the client gets a shape, never a name |
 | 14 | Game 12 — Science Game | DONE | |
 | 15 | Game 13 — Barber Game | DONE | |
-| 16 | Integration: link the Arcade from `huud-website.html`, README, final polish | TODO | |
+| 16 | Integration: link the Arcade from `huud-website.html`, README, final polish | DONE | All 13 games built and passing |
+
+---
+
+## 5b. Status
+
+All 16 phases are complete: 13 games, all registered on both sides, all exercised by
+`npm run check`. The tracker above is kept for the history of how it was built and for
+where each piece lives; new work goes below as new rows.
+
+| # | Phase | Status | Notes |
+|---|---|---|---|
+| 17 | (next) | TODO | |
 
 ---
 

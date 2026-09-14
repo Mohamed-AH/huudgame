@@ -20,7 +20,12 @@
     <style>
         * { -webkit-tap-highlight-color: transparent; }
 
-        html { scroll-behavior: smooth; }
+        html {
+            scroll-behavior: smooth;
+            /* The header is sticky, so an anchor jump would otherwise land with the
+               section title hidden underneath it. */
+            scroll-padding-top: 5.5rem;
+        }
 
         body {
             font-family: 'Outfit', sans-serif;
@@ -152,6 +157,7 @@
                 <a href="#arcade" class="hover:text-amber-400 transition-colors flex items-center gap-2 text-amber-400">
                     <i data-lucide="gamepad-2" class="w-5 h-5"></i> Gold Arcade
                 </a>
+                <a href="#family-arcade" class="hover:text-amber-400 transition-colors">Family Arcade</a>
                 <a href="#trophies" class="hover:text-amber-400 transition-colors">Trophies</a>
             </nav>
 
@@ -171,6 +177,7 @@
             <a href="#superpowers" class="text-lg hover:text-amber-400">Superpowers</a>
             <a href="#creations" class="text-lg hover:text-amber-400">Creations</a>
             <a href="#arcade" class="text-lg text-amber-400">Gold Arcade</a>
+            <a href="#family-arcade" class="text-lg hover:text-amber-400">Family Arcade</a>
             <a href="#trophies" class="text-lg hover:text-amber-400">Trophies</a>
         </div>
     </header>
@@ -398,6 +405,43 @@
                             <span id="sound-toggle-label">On</span>
                         </button>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HUUD Family Arcade: the 14-player multiplayer suite. Served by the Node
+             server in server/ - see README.md. This block is additive; nothing above
+             it was changed. -->
+        <section id="family-arcade" class="space-y-8">
+            <div class="text-center space-y-3">
+                <div class="inline-block bg-amber-400 text-black font-luckiest px-3 py-1 rounded-lg text-xs">14 PLAYERS</div>
+                <h2 class="font-luckiest text-3xl sm:text-4xl md:text-6xl gold-text">HUUD FAMILY ARCADE 🎮</h2>
+                <p class="font-fredoka text-lg text-gray-400">Thirteen 3D games the whole family plays at once — phones, iPads and laptops together. One link, one 4-letter room code, no installs.</p>
+            </div>
+
+            <div class="gold-border bg-slate-950/90 rounded-3xl p-5 sm:p-6 md:p-8 space-y-6">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                    <div class="gold-card rounded-2xl p-4 text-center space-y-2"><div class="text-3xl">🔢</div><div class="font-fredoka text-sm text-amber-300">Guess a Number</div></div>
+                    <div class="gold-card rounded-2xl p-4 text-center space-y-2"><div class="text-3xl">🧱</div><div class="font-fredoka text-sm text-amber-300">Voxel Sandbox</div></div>
+                    <div class="gold-card rounded-2xl p-4 text-center space-y-2"><div class="text-3xl">🏎️</div><div class="font-fredoka text-sm text-amber-300">Car Race</div></div>
+                    <div class="gold-card rounded-2xl p-4 text-center space-y-2"><div class="text-3xl">🥭</div><div class="font-fredoka text-sm text-amber-300">Mango Target</div></div>
+                    <div class="gold-card rounded-2xl p-4 text-center space-y-2"><div class="text-3xl">🧁</div><div class="font-fredoka text-sm text-amber-300">Baking Kitchen</div></div>
+                    <div class="gold-card rounded-2xl p-4 text-center space-y-2"><div class="text-3xl">🍦</div><div class="font-fredoka text-sm text-amber-300">Ice Cream Inc.</div></div>
+                    <div class="gold-card rounded-2xl p-4 text-center space-y-2"><div class="text-3xl">🚂</div><div class="font-fredoka text-sm text-amber-300">Train Race</div></div>
+                    <div class="gold-card rounded-2xl p-4 text-center space-y-2"><div class="text-3xl">🧸</div><div class="font-fredoka text-sm text-amber-300">Baby Cleaning</div></div>
+                    <div class="gold-card rounded-2xl p-4 text-center space-y-2"><div class="text-3xl">🚌</div><div class="font-fredoka text-sm text-amber-300">Bus Cleaning</div></div>
+                    <div class="gold-card rounded-2xl p-4 text-center space-y-2"><div class="text-3xl">🪙</div><div class="font-fredoka text-sm text-amber-300">Car Coins</div></div>
+                    <div class="gold-card rounded-2xl p-4 text-center space-y-2"><div class="text-3xl">🦒</div><div class="font-fredoka text-sm text-amber-300">Guess Animal</div></div>
+                    <div class="gold-card rounded-2xl p-4 text-center space-y-2"><div class="text-3xl">🧪</div><div class="font-fredoka text-sm text-amber-300">Science Game</div></div>
+                    <div class="gold-card rounded-2xl p-4 text-center space-y-2"><div class="text-3xl">💈</div><div class="font-fredoka text-sm text-amber-300">Barber Game</div></div>
+                    <div class="gold-card rounded-2xl p-4 text-center space-y-2"><div class="text-3xl">👑</div><div class="font-fredoka text-sm text-gray-400">Up to 14 seats</div></div>
+                </div>
+
+                <div class="text-center space-y-3">
+                    <a href="play/" class="btn-gold px-8 py-3 rounded-2xl font-luckiest text-xl inline-flex items-center gap-2">
+                        <i data-lucide="gamepad-2" class="w-5 h-5 text-black"></i> OPEN THE ARCADE
+                    </a>
+                    <p class="text-xs text-gray-500 font-fredoka">The Family Arcade needs the game server running: <span class="font-mono text-amber-500">npm install &amp;&amp; npm start</span>, then everyone opens the same address.</p>
                 </div>
             </div>
         </section>
